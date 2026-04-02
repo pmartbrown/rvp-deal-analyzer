@@ -771,7 +771,7 @@
                                 <div class="form-grid" style="margin-top: 16px;">
                                     <div class="form-group"><label class="form-label">Interest Rate (%)</label><div class="form-group"><input type="number" id="asking_sf_rate" placeholder="Rate" min="0" max="15" step="0.1" oninput="calculateAll()" value="6"><div class="range-slider-wrapper"><input type="range" id="asking_sf_rate_slider" min="0" max="15" step="0.1" oninput="document.getElementById('asking_sf_rate').value = this.value; calculateAll();" value="6"><div class="range-label"><span>0%</span><span>15%</span></div></div></div></div>
                                     <div class="form-group"><label class="form-label">Amortization (Years)</label><input type="number" id="asking_sf_years" placeholder="Years" oninput="calculateAll()" value="30"></div>
-                                    <div class="form-group"><label class="form-label">Interest-Only (Years)</label><input type="number" id="asking_sf_io" placeholder="IO Years" oninput="calculateAll()" value="0"></div>
+                                    <div class="form-group"><label class="form-label">Interest-Only (Years)</label><input type="number" id="asking_sf_io" placeholder="IO Years" oninput="calculateAll()" value="30"></div>
                                 </div>
                                 <div class="form-grid" style="margin-top: 16px;">
                                     <div class="output-field"><span class="form-label">Monthly Payment</span><span class="output-value numeric" id="asking_sf_payment">$0</span></div>
@@ -804,7 +804,7 @@
                                 <div class="form-grid" style="margin-top: 16px;">
                                     <div class="form-group"><label class="form-label">LP Interest Rate (%)</label><div class="form-group"><input type="number" id="asking_lp_rate" placeholder="Rate" min="0" max="15" step="0.1" oninput="calculateAll()" value="6"><div class="range-slider-wrapper"><input type="range" id="asking_lp_rate_slider" min="0" max="15" step="0.1" oninput="document.getElementById('asking_lp_rate').value = this.value; calculateAll();" value="6"><div class="range-label"><span>0%</span><span>15%</span></div></div></div></div>
                                     <div class="form-group"><label class="form-label">LP Amortization (Years)</label><input type="number" id="asking_lp_years" placeholder="Years" oninput="calculateAll()" value="30"></div>
-                                    <div class="form-group"><label class="form-label">LP Interest-Only (Years)</label><input type="number" id="asking_lp_io" placeholder="IO Years" oninput="calculateAll()" value="0"></div>
+                                    <div class="form-group"><label class="form-label">LP Interest-Only (Years)</label><input type="number" id="asking_lp_io" placeholder="IO Years" oninput="calculateAll()" value="30"></div>
                                 </div>
                                 <div class="form-grid" style="margin-top: 16px;">
                                     <div class="output-field"><span class="form-label">LP Monthly Payment</span><span class="output-value numeric" id="asking_lp_payment">$0</span></div>
@@ -915,7 +915,7 @@
                                 <div class="form-grid" style="margin-top: 16px;">
                                     <div class="form-group"><label class="form-label">Interest Rate (%)</label><div class="form-group"><input type="number" id="my_sf_rate" placeholder="Rate" min="0" max="15" step="0.1" oninput="calculateAll()" value="6"><div class="range-slider-wrapper"><input type="range" id="my_sf_rate_slider" min="0" max="15" step="0.1" oninput="document.getElementById('my_sf_rate').value = this.value; calculateAll();" value="6"><div class="range-label"><span>0%</span><span>15%</span></div></div></div></div>
                                     <div class="form-group"><label class="form-label">Amortization (Years)</label><input type="number" id="my_sf_years" placeholder="Years" oninput="calculateAll()" value="30"></div>
-                                    <div class="form-group"><label class="form-label">Interest-Only (Years)</label><input type="number" id="my_sf_io" placeholder="IO Years" oninput="calculateAll()" value="0"></div>
+                                    <div class="form-group"><label class="form-label">Interest-Only (Years)</label><input type="number" id="my_sf_io" placeholder="IO Years" oninput="calculateAll()" value="30"></div>
                                 </div>
                                 <div class="form-grid" style="margin-top: 16px;">
                                     <div class="output-field"><span class="form-label">Monthly Payment</span><span class="output-value numeric" id="my_sf_payment">$0</span></div>
@@ -948,7 +948,7 @@
                                 <div class="form-grid" style="margin-top: 16px;">
                                     <div class="form-group"><label class="form-label">LP Interest Rate (%)</label><div class="form-group"><input type="number" id="my_lp_rate" placeholder="Rate" min="0" max="15" step="0.1" oninput="calculateAll()" value="6"><div class="range-slider-wrapper"><input type="range" id="my_lp_rate_slider" min="0" max="15" step="0.1" oninput="document.getElementById('my_lp_rate').value = this.value; calculateAll();" value="6"><div class="range-label"><span>0%</span><span>15%</span></div></div></div></div>
                                     <div class="form-group"><label class="form-label">LP Amortization (Years)</label><input type="number" id="my_lp_years" placeholder="Years" oninput="calculateAll()" value="30"></div>
-                                    <div class="form-group"><label class="form-label">LP Interest-Only (Years)</label><input type="number" id="my_lp_io" placeholder="IO Years" oninput="calculateAll()" value="0"></div>
+                                    <div class="form-group"><label class="form-label">LP Interest-Only (Years)</label><input type="number" id="my_lp_io" placeholder="IO Years" oninput="calculateAll()" value="30"></div>
                                 </div>
                                 <div class="form-grid" style="margin-top: 16px;">
                                     <div class="output-field"><span class="form-label">LP Monthly Payment</span><span class="output-value numeric" id="my_lp_payment">$0</span></div>
@@ -1342,8 +1342,8 @@
                 const input = document.getElementById(inputId);
                 const slider = document.getElementById(sliderId);
                 if (input && slider) {
-                    input.addEventListener('change', () => { slider.value = input.value; });
-                    slider.addEventListener('change', () => { input.value = slider.value; });
+                    input.addEventListener('input', () => { slider.value = input.value; });
+                    slider.addEventListener('input', () => { input.value = slider.value; });
                 }
             });
         }
@@ -1374,6 +1374,7 @@
             setText(scenario + '_gross_income', formatCurrency(data.gross_income));
             setText(scenario + '_occupancy_pct', formatPercent(data.occupancy * 100));
 
+            data.goe = goe;
             data.goe_pct = data.gross_income > 0 ? goe / data.gross_income : 0;
             data.noi = data.gross_income - goe;
             setText(scenario + '_goe_pct', formatPercent(data.goe_pct * 100));
@@ -1415,7 +1416,7 @@
             data.lp_capital = data.total_capital;
             setText(scenario + '_lp_capital', formatCurrency(data.lp_capital));
 
-            data.lp_debt = Math.max(0, data.noi * (lp_pct / 100));
+            data.lp_debt = data.lp_capital;
 
             const lp_nper = lp_years * 12;
             const lp_rate_monthly = lp_rate / 12;
@@ -1476,9 +1477,9 @@
             setText(scenario + '_owner_monthly_hero', formatCurrency(data.owner_monthly_cf));
 
             data.lp_equity = data.lp_capital;
-            data.lp_cf_amount = Math.max(0, data.owner_cf * (lp_pct / 100 / 100));
-            data.lp_total_income = data.lp_cf_amount + lp_annual_principal;
-            data.lp_coc = data.lp_equity > 0 ? (data.lp_cf_amount / data.lp_equity) * 100 : 0;
+            data.lp_cf_amount = Math.max(0, data.owner_cf * (lp_pct / 100));
+            data.lp_total_income = data.lp_cf_amount + lp_annual_interest + lp_annual_principal;
+            data.lp_coc = data.lp_equity > 0 ? (data.lp_total_income / data.lp_equity) * 100 : 0;
 
             setText(scenario + '_lp_equity', formatCurrency(data.lp_equity));
             setText(scenario + '_lp_cf_amount', formatCurrency(data.lp_cf_amount));
@@ -1532,7 +1533,7 @@
                 setText('fy_units' + suffix, Math.round(my.units || 270));
                 setText('fy_occupied' + suffix, Math.round(my.occupied || 270));
                 const occupancy_pct = my.units > 0 ? (my.occupied || 270) / (my.units || 270) : 1;
-                setText('fy_occupancy_pct' + suffix, formatPercent(occupancy_pct));
+                setText('fy_occupancy_pct' + suffix, formatPercent(occupancy_pct * 100));
 
                 // Monthly Rents
                 let base_rent;
@@ -1568,7 +1569,7 @@
                 setText('fy_value_change' + suffix, formatCurrency(value_change));
 
                 const ltv = valuation > 0 ? (my.total_debt || 15225000) / valuation : 0;
-                setText('fy_ltv' + suffix, formatPercent(ltv));
+                setText('fy_ltv' + suffix, formatPercent(ltv * 100));
 
                 // Color code LTV
                 const ltvEl = document.getElementById('fy_ltv' + suffix);
@@ -1600,8 +1601,8 @@
                 const total_cf = noi - total_servicing;
                 setText('fy_total_cf' + suffix, formatCurrency(total_cf));
 
-                const lp_pct = my.lp_pct || 0.8;
-                const lp_share = my.lp_equity === 'Yes' ? lp_pct : 0;
+                const lp_pct_raw = my.lp_pct || 80;
+                const lp_share = my.lp_equity === 'Yes' ? lp_pct_raw / 100 : 0;
                 setText('fy_lp_share_pct' + suffix, formatPercent(lp_share));
 
                 const lp_cf = total_cf * lp_share;
