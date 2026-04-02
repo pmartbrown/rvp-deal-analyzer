@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RVP Deal Analysis Worksheet</title>
+    <title>RVP Deal Analysis Calculator</title>
     <style>
         * {
             margin: 0;
@@ -11,557 +11,1001 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --bg-light: #f8fafc;
+            --primary: #1e3a5f;
+            --accent: #10b981;
+            --positive: #10b981;
+            --warning: #f59e0b;
+            --negative: #ef4444;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --border: #e5e7eb;
+            --white: #ffffff;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f5f5;
-            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-top: 100px;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
+        .sticky-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
-        header {
-            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 8px 8px 0 0;
-            margin-bottom: 0;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        .sticky-header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
-        header h1 {
-            font-size: 28px;
+        .sticky-header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .sticky-header-right {
+            display: flex;
+            gap: 48px;
+            align-items: center;
+        }
+
+        .metric-item {
+            text-align: right;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: var(--text-light);
+            text-transform: uppercase;
             font-weight: 600;
             letter-spacing: 0.5px;
+            margin-bottom: 4px;
         }
 
-        header p {
+        .metric-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .metric-value.positive {
+            color: var(--positive);
+        }
+
+        .metric-value.negative {
+            color: var(--negative);
+        }
+
+        .tab-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 32px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .tab-button.active {
+            color: var(--accent);
+        }
+
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--accent);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .delta-bar {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 32px;
+            border: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .delta-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .delta-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 12px;
+            color: white;
+        }
+
+        .delta-icon.positive {
+            background-color: var(--positive);
+        }
+
+        .delta-icon.negative {
+            background-color: var(--negative);
+        }
+
+        .delta-text {
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+
+        .delta-value {
+            font-weight: 700;
+        }
+
+        .scenarios-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin-bottom: 48px;
+        }
+
+        .hero-card {
+            background: linear-gradient(135deg, var(--accent) 0%, #059669 100%);
+            color: white;
+            padding: 28px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .hero-card.negative {
+            background: linear-gradient(135deg, var(--negative) 0%, #dc2626 100%);
+            box-shadow: 0 4px 6px rgba(239, 68, 68, 0.15);
+        }
+
+        .hero-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px rgba(16, 185, 129, 0.25);
+        }
+
+        .hero-card.negative:hover {
+            box-shadow: 0 8px 12px rgba(239, 68, 68, 0.25);
+        }
+
+        .hero-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .hero-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .hero-subvalue {
             font-size: 14px;
             opacity: 0.9;
-            margin-top: 5px;
+            font-weight: 500;
         }
 
-        .main-content {
+        .accordion {
+            background: var(--white);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .accordion-header {
+            padding: 20px 24px;
+            background: var(--white);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--primary);
+            transition: all 0.3s ease;
+            border-bottom: 1px solid transparent;
+        }
+
+        .accordion-header:hover {
+            background-color: #f9fafb;
+        }
+
+        .accordion.expanded .accordion-header {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .accordion-chevron {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            position: relative;
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .accordion.expanded .accordion-chevron {
+            transform: rotate(180deg);
+        }
+
+        .accordion-chevron::before,
+        .accordion-chevron::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 10px;
+            background-color: var(--primary);
+            top: 50%;
+        }
+
+        .accordion-chevron::before {
+            left: 4px;
+            transform: translateY(-50%) rotate(-45deg);
+            transform-origin: center;
+        }
+
+        .accordion-chevron::after {
+            right: 4px;
+            transform: translateY(-50%) rotate(45deg);
+            transform-origin: center;
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .accordion.expanded .accordion-content {
+            max-height: 2000px;
+        }
+
+        .accordion-body {
+            padding: 24px;
+        }
+
+        .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
-            margin-bottom: 30px;
         }
 
-        .section {
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        .form-grid.full {
+            grid-template-columns: 1fr;
         }
 
-        .section-title {
-            background-color: #2d5a7b;
-            color: white;
-            padding: 15px 20px;
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 13px;
             font-weight: 600;
-            font-size: 16px;
-        }
-
-        .five-year-title {
-            background-color: #d946a6;
-        }
-
-        .section-content {
-            padding: 20px;
-        }
-
-        .row {
-            display: grid;
-            grid-template-columns: 150px 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 12px;
-            align-items: center;
-            padding: 8px;
-            border-radius: 4px;
-        }
-
-        .row-label {
-            font-weight: 500;
-            font-size: 13px;
-            color: #333;
-        }
-
-        .cell {
-            padding: 8px 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 13px;
-            text-align: right;
-            background-color: white;
-        }
-
-        .cell-input {
-            background-color: #c6efce;
-            color: #333;
-            font-weight: 500;
-            border: 1px solid #5eb95e;
-        }
-
-        .cell-input input {
-            width: 100%;
-            padding: 6px 8px;
-            border: 1px solid #5eb95e;
-            border-radius: 3px;
-            font-size: 13px;
-            font-weight: 500;
-            background-color: #c6efce;
-            color: #333;
-        }
-
-        .cell-input input:focus {
-            outline: none;
-            border-color: #2d5a7b;
-            box-shadow: 0 0 4px rgba(45, 90, 123, 0.3);
-        }
-
-        .cell-calculated {
-            background-color: #f0f0f0;
-            color: #333;
-            font-weight: 500;
-        }
-
-        .cell-highlight {
-            background-color: #ffff00;
-            color: #000;
-            font-weight: 600;
-        }
-
-        .cell-dropdown {
-            background-color: #c6efce;
-            border: 1px solid #5eb95e;
-            border-radius: 3px;
-            padding: 5px;
-            font-size: 13px;
-            cursor: pointer;
-        }
-
-        .cell-dropdown:focus {
-            outline: none;
-            border-color: #2d5a7b;
-            box-shadow: 0 0 4px rgba(45, 90, 123, 0.3);
-        }
-
-        .section-spacer {
-            height: 12px;
-            margin-bottom: 8px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .section-label {
-            font-weight: 600;
-            color: #2d5a7b;
-            font-size: 12px;
+            color: var(--text-dark);
             text-transform: uppercase;
-            padding: 10px 8px 5px 8px;
-            margin-top: 8px;
+            letter-spacing: 0.5px;
         }
 
-        .five-year-section {
-            grid-column: 1 / -1;
-            background: white;
+        .currency-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .currency-symbol {
+            position: absolute;
+            left: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            pointer-events: none;
+        }
+
+        .currency-input {
+            padding-left: 28px;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        select {
+            padding: 12px 16px;
+            border: 1px solid var(--border);
             border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background-color: var(--white);
+            color: var(--text-dark);
         }
 
-        .five-year-content {
-            padding: 20px;
+        input[type="number"]:focus,
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
         }
 
-        .year-table {
+        .range-slider-wrapper {
+            margin-top: 12px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: linear-gradient(to right, var(--accent) 0%, var(--accent) 100%);
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        input[type="range"]::-moz-range-track {
+            background: transparent;
+            border: none;
+        }
+
+        input[type="range"]::-moz-range-progress {
+            background-color: var(--accent);
+            height: 6px;
+            border-radius: 3px;
+        }
+
+        .range-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 6px;
+        }
+
+        .output-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 12px 16px;
+            background-color: #f9fafb;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .output-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .output-value.positive {
+            color: var(--positive);
+        }
+
+        .output-value.negative {
+            color: var(--negative);
+        }
+
+        .output-value.warning {
+            color: var(--warning);
+        }
+
+        .chart-container {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+            border: 1px solid var(--border);
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-dark);
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.noi {
+            background-color: #3b82f6;
+        }
+
+        .legend-dot.cash-flow {
+            background-color: #10b981;
+        }
+
+        .legend-dot.owner-cf {
+            background-color: #f59e0b;
+        }
+
+        svg {
+            width: 100%;
+            height: auto;
+            max-height: 300px;
+        }
+
+        .table-container {
+            background: var(--white);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow-x: auto;
+        }
+
+        table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 12px;
-            margin-top: 15px;
         }
 
-        .year-table th {
-            background-color: #f0f0f0;
-            padding: 10px;
-            text-align: right;
-            font-weight: 600;
-            border: 1px solid #ddd;
+        thead {
+            background-color: var(--primary);
+            color: white;
         }
 
-        .year-table th:first-child {
+        th {
+            padding: 16px;
             text-align: left;
-        }
-
-        .year-table td {
-            padding: 10px;
-            border: 1px solid #ddd;
-            text-align: right;
-        }
-
-        .year-table td:first-child {
-            text-align: left;
-            font-weight: 500;
-            color: #333;
-            background-color: #f9f9f9;
-        }
-
-        .year-table .section-header {
-            background-color: #e8e8e8;
             font-weight: 600;
-            padding: 12px 10px;
-            color: #2d5a7b;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .year-table .editable-cell {
-            background-color: #c6efce;
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
         }
 
-        .year-table .editable-cell input {
-            width: 100%;
-            padding: 5px;
-            border: 1px solid #5eb95e;
-            border-radius: 3px;
-            font-size: 12px;
-            font-weight: 500;
-            background-color: #c6efce;
-            color: #333;
+        tbody tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+        tbody tr:hover {
+            background-color: #f3f4f6;
+        }
+
+        .section-header {
+            background-color: var(--accent);
+            color: white;
+            font-weight: 700;
+            border-left: 4px solid var(--primary);
+        }
+
+        .section-header td {
+            padding: 14px 16px;
+        }
+
+        .numeric {
             text-align: right;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
         }
 
-        .year-table .editable-cell input:focus {
-            outline: none;
-            border-color: #2d5a7b;
-            box-shadow: 0 0 4px rgba(45, 90, 123, 0.3);
+        @keyframes highlight {
+            0%, 100% { background-color: transparent; }
+            50% { background-color: #fef3c7; }
         }
 
-        .year-table .highlight-cell {
-            background-color: #ffff00;
-            font-weight: 600;
+        .highlight {
+            animation: highlight 0.5s ease;
         }
 
-        @media (max-width: 1200px) {
-            .main-content {
+        @media (max-width: 1024px) {
+            .scenarios-grid {
                 grid-template-columns: 1fr;
             }
-
-            .row {
-                grid-template-columns: 150px 1fr;
-                gap: 10px;
+            .sticky-header-right {
+                gap: 24px;
+            }
+            .metric-value {
+                font-size: 16px;
             }
         }
 
         @media (max-width: 768px) {
-            header {
-                padding: 20px;
-            }
-
-            header h1 {
-                font-size: 22px;
-            }
-
-            .section-content {
-                padding: 15px;
-            }
-
-            .row {
+            .form-grid {
                 grid-template-columns: 1fr;
-                gap: 5px;
-                margin-bottom: 10px;
             }
+            .sticky-header {
+                padding: 0 16px;
+                flex-direction: column;
+                height: auto;
+                gap: 12px;
+            }
+            .sticky-header-right {
+                width: 100%;
+                justify-content: space-around;
+                gap: 16px;
+            }
+            .delta-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .tab-container {
+                padding: 0 16px;
+            }
+            body {
+                padding-top: 120px;
+            }
+        }
 
-            .row-label {
-                font-weight: 600;
-                margin-bottom: 5px;
-            }
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231e3a5f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 20px;
+            padding-right: 32px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>RVP Deal Analysis Worksheet</h1>
-            <p>Professional RV Park Purchase and 5-Year Projection Analysis</p>
-        </header>
+    <div class="sticky-header">
+        <div class="sticky-header-left">
+            <div class="sticky-header-title">RVP Deal Analysis</div>
+        </div>
+        <div class="sticky-header-right">
+            <div class="metric-item">
+                <div class="metric-label">Asking CF/Month</div>
+                <div class="metric-value" id="sticky_asking_monthly">$0</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-label">Your CF/Month</div>
+                <div class="metric-value" id="sticky_my_monthly">$0</div>
+            </div>
+        </div>
+    </div>
 
-        <div class="main-content">
-            <!-- PURCHASE ANALYSIS SECTION -->
-            <div class="section">
-                <div class="section-title">Purchase Analysis</div>
-                <div class="section-content">
-                    <!-- Income Analysis -->
-                    <div class="section-label">Income Analysis</div>
-                    <div class="row">
-                        <div class="row-label">Gross Potential Rent</div>
-                        <div class="cell cell-input"><input type="number" id="asking_gpr" placeholder="0" step="1000"></div>
-                        <div class="cell cell-input"><input type="number" id="my_gpr" placeholder="0" step="1000"></div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">Total Units</div>
-                        <div class="cell cell-input"><input type="number" id="asking_units" value="270" step="1"></div>
-                        <div class="cell cell-input"><input type="number" id="my_units" value="270" step="1"></div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">Occupied Units</div>
-                        <div class="cell cell-input"><input type="number" id="asking_occupied" value="270" step="1"></div>
-                        <div class="cell cell-input"><input type="number" id="my_occupied" value="270" step="1"></div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">Gross Income</div>
-                        <div class="cell cell-calculated" id="asking_gross_income">$2,100,000</div>
-                        <div class="cell cell-calculated" id="my_gross_income">$2,100,000</div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">GOE %</div>
-                        <div class="cell cell-calculated" id="asking_goe_pct">43.8%</div>
-                        <div class="cell cell-calculated" id="my_goe_pct">35.0%</div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">GOE Amount</div>
-                        <div class="cell cell-input"><input type="number" id="asking_goe" value="920000" step="10000"></div>
-                        <div class="cell cell-input"><input type="number" id="my_goe" value="735000" step="10000"></div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">NOI</div>
-                        <div class="cell cell-calculated" id="asking_noi">$1,180,000</div>
-                        <div class="cell cell-calculated" id="my_noi">$1,365,000</div>
-                    </div>
+    <div class="tab-container">
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('deal-analysis')">Deal Analysis</button>
+            <button class="tab-button" onclick="switchTab('five-year')">5-Year Projections</button>
+        </div>
 
-                    <div class="section-spacer"></div>
-
-                    <!-- Financing Analysis -->
-                    <div class="section-label">Seller Financing</div>
-                    <div class="row">
-                        <div class="row-label">Purchase Price</div>
-                        <div class="cell cell-input"><input type="number" id="asking_purchase" value="15000000" step="100000"></div>
-                        <div class="cell cell-input"><input type="number" id="my_purchase" value="15000000" step="100000"></div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">% Seller Finance</div>
-                        <div class="cell cell-input"><input type="number" id="asking_sf_pct" value="60" step="1" max="100">%</div>
-                        <div class="cell cell-input"><input type="number" id="my_sf_pct" value="60" step="1" max="100">%</div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">SF Amount</div>
-                        <div class="cell cell-calculated" id="asking_sf_amount">$9,000,000</div>
-                        <div class="cell cell-calculated" id="my_sf_amount">$9,000,000</div>
-                    </div>
-
-                    <div class="section-spacer"></div>
-
-                    <div class="section-label">Seller Debt Terms</div>
-                    <div class="row">
-                        <div class="row-label">Interest Rate</div>
-                        <div class="cell cell-input"><input type="number" id="asking_sf_rate" value="6" step="0.5" max="100">%</div>
-                        <div class="cell cell-input"><input type="number" id="my_sf_rate" value="6" step="0.5" max="100">%</div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">Amortization Years</div>
-                        <div class="cell cell-input"><input type="number" id="asking_sf_years" value="30" step="1"></div>
-                        <div class="cell cell-input"><input type="number" id="my_sf_years" value="30" step="1"></div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">Interest Only?</div>
-                        <div class="cell cell-input">
-                            <select id="asking_sf_io" class="cell-dropdown">
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        <div class="cell cell-input">
-                            <select id="my_sf_io" class="cell-dropdown">
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">SF Payment Amount</div>
-                        <div class="cell cell-calculated" id="asking_sf_payment">$540,000</div>
-                        <div class="cell cell-calculated" id="my_sf_payment">$540,000</div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">Interest Portion</div>
-                        <div class="cell cell-calculated" id="asking_sf_interest">$540,000</div>
-                        <div class="cell cell-calculated" id="my_sf_interest">$540,000</div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">Principle Portion</div>
-                        <div class="cell cell-calculated" id="asking_sf_principal">$0</div>
-                        <div class="cell cell-calculated" id="my_sf_principal">$0</div>
-                    </div>
-
-                    <div class="section-spacer"></div>
-
-                    <!-- Capital Requirements -->
-                    <div class="section-label">Capital Requirements</div>
-                    <div class="row">
-                        <div class="row-label">Down Payment</div>
-                        <div class="cell cell-calculated" id="asking_down_payment">$6,000,000</div>
-                        <div class="cell cell-calculated" id="my_down_payment">$6,000,000</div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">Acquisition Fee</div>
-                        <div class="cell cell-input"><input type="number" id="asking_acq_fee" value="50000" step="10000"></div>
-                        <div class="cell cell-input"><input type="number" id="my_acq_fee" value="50000" step="10000"></div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">CapEx</div>
-                        <div class="cell cell-input"><input type="number" id="asking_capex" value="100000" step="10000"></div>
-                        <div class="cell cell-input"><input type="number" id="my_capex" value="100000" step="10000"></div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">Referral Fee</div>
-                        <div class="cell cell-input"><input type="number" id="asking_referral" value="0" step="10000"></div>
-                        <div class="cell cell-input"><input type="number" id="my_referral" value="0" step="10000"></div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">Closing</div>
-                        <div class="cell cell-input"><input type="number" id="asking_closing" value="75000" step="10000"></div>
-                        <div class="cell cell-input"><input type="number" id="my_closing" value="75000" step="10000"></div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">LP Capital Required</div>
-                        <div class="cell cell-calculated" id="asking_lp_capital">$6,225,000</div>
-                        <div class="cell cell-calculated" id="my_lp_capital">$6,225,000</div>
-                    </div>
-
-                    <div class="section-spacer"></div>
-
-                    <!-- LP Debt Terms -->
-                    <div class="section-label">LP Debt Terms</div>
-                    <div class="row">
-                        <div class="row-label">LP Int Rate</div>
-                        <div class="cell cell-input"><input type="number" id="asking_lp_rate" value="6" step="0.5" max="100">%</div>
-                        <div class="cell cell-input"><input type="number" id="my_lp_rate" value="6" step="0.5" max="100">%</div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">LP Amortization Years</div>
-                        <div class="cell cell-input"><input type="number" id="asking_lp_years" value="30" step="1"></div>
-                        <div class="cell cell-input"><input type="number" id="my_lp_years" value="30" step="1"></div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">Interest Only?</div>
-                        <div class="cell cell-input">
-                            <select id="asking_lp_io" class="cell-dropdown">
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        <div class="cell cell-input">
-                            <select id="my_lp_io" class="cell-dropdown">
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">LP Payment Amount</div>
-                        <div class="cell cell-calculated" id="asking_lp_payment">$373,500</div>
-                        <div class="cell cell-calculated" id="my_lp_payment">$373,500</div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">Interest Portion</div>
-                        <div class="cell cell-calculated" id="asking_lp_interest">$373,500</div>
-                        <div class="cell cell-calculated" id="my_lp_interest">$373,500</div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">Principle Portion</div>
-                        <div class="cell cell-calculated" id="asking_lp_principal">$0</div>
-                        <div class="cell cell-calculated" id="my_lp_principal">$0</div>
-                    </div>
-
-                    <div class="section-spacer"></div>
-
-                    <!-- Total Debt & Cash Flow -->
-                    <div class="section-label">Total Debt & Cash Flow</div>
-                    <div class="row">
-                        <div class="row-label">Total Debt</div>
-                        <div class="cell cell-calculated" id="asking_total_debt">$15,225,000</div>
-                        <div class="cell cell-calculated" id="my_total_debt">$15,225,000</div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">Total Debt Servicing</div>
-                        <div class="cell cell-calculated" id="asking_total_servicing">$913,500</div>
-                        <div class="cell cell-calculated" id="my_total_servicing">$913,500</div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">Cash Flow</div>
-                        <div class="cell cell-calculated" id="asking_cf">$266,500</div>
-                        <div class="cell cell-calculated" id="my_cf">$451,500</div>
-                    </div>
-
-                    <div class="section-spacer"></div>
-
-                    <!-- LP Returns -->
-                    <div class="section-label">LP Returns</div>
-                    <div class="row">
-                        <div class="row-label">LPs Also Equity Partners?</div>
-                        <div class="cell cell-input">
-                            <select id="asking_lp_equity" class="cell-dropdown">
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        <div class="cell cell-input">
-                            <select id="my_lp_equity" class="cell-dropdown">
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">LP % of Cash Flow</div>
-                        <div class="cell cell-input"><input type="number" id="asking_lp_pct" value="80" step="1" max="100">%</div>
-                        <div class="cell cell-input"><input type="number" id="my_lp_pct" value="80" step="1" max="100">%</div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">LP Cash Flow Amount</div>
-                        <div class="cell cell-calculated" id="asking_lp_cf_amount">$213,200</div>
-                        <div class="cell cell-calculated" id="my_lp_cf_amount">$361,200</div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">LP Total Income</div>
-                        <div class="cell cell-calculated" id="asking_lp_total_income">$586,700</div>
-                        <div class="cell cell-calculated" id="my_lp_total_income">$734,700</div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">LP Cash on Cash %</div>
-                        <div class="cell cell-calculated" id="asking_lp_coc">9.4%</div>
-                        <div class="cell cell-calculated" id="my_lp_coc">11.8%</div>
-                    </div>
-
-                    <div class="section-spacer"></div>
-
-                    <!-- Owner Returns -->
-                    <div class="section-label">Owner Returns</div>
-                    <div class="row">
-                        <div class="row-label">Owner CF Amount</div>
-                        <div class="cell cell-highlight" id="asking_owner_cf">$53,300</div>
-                        <div class="cell cell-highlight" id="my_owner_cf">$90,300</div>
-                    </div>
-                    <div class="row">
-                        <div class="row-label">Owner CF Monthly</div>
-                        <div class="cell cell-calculated" id="asking_owner_monthly">$4,442</div>
-                        <div class="cell cell-calculated" id="my_owner_monthly">$7,525</div>
-                    </div>
+        <div id="deal-analysis" class="tab-content active">
+            <div class="delta-bar">
+                <div class="delta-item">
+                    <div class="delta-icon positive">+</div>
+                    <div class="delta-text">You save <span class="delta-value" id="delta_expenses">$0</span>/year in expenses</div>
+                </div>
+                <div class="delta-item">
+                    <div class="delta-icon positive">+</div>
+                    <div class="delta-text">You generate <span class="delta-value" id="delta_owner_cf">$0</span> more in annual owner CF</div>
                 </div>
             </div>
 
-            <!-- COLUMN HEADERS FOR SCENARIOS -->
-            <div style="display: contents;">
-                <div style="text-align: right; padding: 5px; font-weight: 600; color: #2d5a7b;">Asking Scenario</div>
-                <div style="text-align: right; padding: 5px; font-weight: 600; color: #2d5a7b;">My Scenario</div>
+            <div class="scenarios-grid">
+                <div>
+                    <h2 style="font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 20px;">Asking Scenario</h2>
+                    <div class="hero-card" id="asking_hero_card">
+                        <div class="hero-label">Annual Owner Cash Flow</div>
+                        <div class="hero-value" id="asking_owner_cf_hero">$0</div>
+                        <div class="hero-subvalue"><span id="asking_owner_monthly_hero">$0</span>/month</div>
+                    </div>
+
+                    <div class="accordion expanded">
+                        <button class="accordion-header" onclick="this.parentElement.classList.toggle('expanded')">Income Analysis<div class="accordion-chevron"></div></button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="form-grid full">
+                                    <div class="form-group">
+                                        <label class="form-label">Gross Park Revenue (GPR)</label>
+                                        <div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="asking_gpr" class="currency-input" placeholder="Annual GPR" oninput="calculateAll()" value="0"></div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Total Units</label>
+                                        <input type="number" id="asking_units" placeholder="Units" oninput="calculateAll()" value="270">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Occupied Units</label>
+                                        <input type="number" id="asking_occupied" placeholder="Occupied" oninput="calculateAll()" value="270">
+                                    </div>
+                                </div>
+                                <div class="form-grid" style="margin-top: 16px;">
+                                    <div class="output-field"><span class="form-label">Gross Income</span><span class="output-value" id="asking_gross_income">$0</span></div>
+                                    <div class="output-field"><span class="form-label">Occupancy %</span><span class="output-value" id="asking_occupancy_pct">0%</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion expanded">
+                        <button class="accordion-header" onclick="this.parentElement.classList.toggle('expanded')">Operating Expenses<div class="accordion-chevron"></div></button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="form-grid full">
+                                    <div class="form-group">
+                                        <label class="form-label">Gross Operating Expenses</label>
+                                        <div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="asking_goe" class="currency-input" placeholder="GOE" oninput="calculateAll()" value="920000"></div>
+                                    </div>
+                                </div>
+                                <div class="form-grid" style="margin-top: 16px;">
+                                    <div class="output-field"><span class="form-label">GOE as % of Gross Income</span><span class="output-value" id="asking_goe_pct">0%</span></div>
+                                    <div class="output-field"><span class="form-label">Net Operating Income</span><span class="output-value" id="asking_noi">$0</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion expanded">
+                        <button class="accordion-header" onclick="this.parentElement.classList.toggle('expanded')">Purchase & Acquisition<div class="accordion-chevron"></div></button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="form-grid full">
+                                    <div class="form-group">
+                                        <label class="form-label">Purchase Price</label>
+                                        <div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="asking_purchase" class="currency-input" placeholder="Purchase Price" oninput="calculateAll()" value="15000000"></div>
+                                    </div>
+                                </div>
+                                <div class="form-grid" style="margin-top: 16px;">
+                                    <div class="form-group"><label class="form-label">Acquisition Fee</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="asking_acq_fee" class="currency-input" placeholder="Acq Fee" oninput="calculateAll()" value="50000"></div></div>
+                                    <div class="form-group"><label class="form-label">CapEx Reserve</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="asking_capex" class="currency-input" placeholder="CapEx" oninput="calculateAll()" value="100000"></div></div>
+                                    <div class="form-group"><label class="form-label">Referral Fee</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="asking_referral" class="currency-input" placeholder="Referral" oninput="calculateAll()" value="0"></div></div>
+                                    <div class="form-group"><label class="form-label">Closing Costs</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="asking_closing" class="currency-input" placeholder="Closing" oninput="calculateAll()" value="75000"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion expanded">
+                        <button class="accordion-header" onclick="this.parentElement.classList.toggle('expanded')">Seller Financing<div class="accordion-chevron"></div></button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="form-grid full">
+                                    <div class="form-group"><label class="form-label">% Seller Finance</label><div class="form-group"><input type="number" id="asking_sf_pct" placeholder="%" min="0" max="100" oninput="calculateAll()" value="60"><div class="range-slider-wrapper"><input type="range" id="asking_sf_pct_slider" min="0" max="100" oninput="document.getElementById('asking_sf_pct').value = this.value; calculateAll();" value="60"><div class="range-label"><span>0%</span><span>100%</span></div></div></div></div>
+                                    <div class="form-group"><label class="form-label">Seller Finance Amount</label><div class="output-field"><span class="output-value" id="asking_sf_amount">$0</span></div></div>
+                                </div>
+                                <div class="form-grid" style="margin-top: 16px;">
+                                    <div class="form-group"><label class="form-label">Interest Rate (%)</label><div class="form-group"><input type="number" id="asking_sf_rate" placeholder="Rate" min="0" max="15" step="0.1" oninput="calculateAll()" value="6"><div class="range-slider-wrapper"><input type="range" id="asking_sf_rate_slider" min="0" max="15" step="0.1" oninput="document.getElementById('asking_sf_rate').value = this.value; calculateAll();" value="6"><div class="range-label"><span>0%</span><span>15%</span></div></div></div></div>
+                                    <div class="form-group"><label class="form-label">Amortization (Years)</label><input type="number" id="asking_sf_years" placeholder="Years" oninput="calculateAll()" value="30"></div>
+                                    <div class="form-group"><label class="form-label">Interest-Only (Years)</label><input type="number" id="asking_sf_io" placeholder="IO Years" oninput="calculateAll()" value="0"></div>
+                                </div>
+                                <div class="form-grid" style="margin-top: 16px;">
+                                    <div class="output-field"><span class="form-label">Monthly Payment</span><span class="output-value numeric" id="asking_sf_payment">$0</span></div>
+                                    <div class="output-field"><span class="form-label">Annual Interest</span><span class="output-value numeric" id="asking_sf_interest">$0</span></div>
+                                    <div class="output-field"><span class="form-label">Annual Principal</span><span class="output-value numeric" id="asking_sf_principal">$0</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion expanded">
+                        <button class="accordion-header" onclick="this.parentElement.classList.toggle('expanded')">Capital Requirements<div class="accordion-chevron"></div></button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="form-grid full">
+                                    <div class="form-group"><label class="form-label">Down Payment</label><div class="output-field"><span class="output-value numeric" id="asking_down_payment">$0</span></div></div>
+                                    <div class="form-group"><label class="form-label">LP Equity Required</label><div class="output-field"><span class="output-value numeric" id="asking_lp_capital">$0</span></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion expanded">
+                        <button class="accordion-header" onclick="this.parentElement.classList.toggle('expanded')">LP Debt Terms<div class="accordion-chevron"></div></button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="form-grid full">
+                                    <div class="form-group"><label class="form-label">LP Debt as % of Cash Flow</label><div class="form-group"><input type="number" id="asking_lp_pct" placeholder="%" min="0" max="100" oninput="calculateAll()" value="80"><div class="range-slider-wrapper"><input type="range" id="asking_lp_pct_slider" min="0" max="100" oninput="document.getElementById('asking_lp_pct').value = this.value; calculateAll();" value="80"><div class="range-label"><span>0%</span><span>100%</span></div></div></div></div>
+                                </div>
+                                <div class="form-grid" style="margin-top: 16px;">
+                                    <div class="form-group"><label class="form-label">LP Interest Rate (%)</label><div class="form-group"><input type="number" id="asking_lp_rate" placeholder="Rate" min="0" max="15" step="0.1" oninput="calculateAll()" value="6"><div class="range-slider-wrapper"><input type="range" id="asking_lp_rate_slider" min="0" max="15" step="0.1" oninput="document.getElementById('asking_lp_rate').value = this.value; calculateAll();" value="6"><div class="range-label"><span>0%</span><span>15%</span></div></div></div></div>
+                                    <div class="form-group"><label class="form-label">LP Amortization (Years)</label><input type="number" id="asking_lp_years" placeholder="Years" oninput="calculateAll()" value="30"></div>
+                                    <div class="form-group"><label class="form-label">LP Interest-Only (Years)</label><input type="number" id="asking_lp_io" placeholder="IO Years" oninput="calculateAll()" value="0"></div>
+                                </div>
+                                <div class="form-grid" style="margin-top: 16px;">
+                                    <div class="output-field"><span class="form-label">LP Monthly Payment</span><span class="output-value numeric" id="asking_lp_payment">$0</span></div>
+                                    <div class="output-field"><span class="form-label">LP Annual Interest</span><span class="output-value numeric" id="asking_lp_interest">$0</span></div>
+                                    <div class="output-field"><span class="form-label">LP Annual Principal</span><span class="output-value numeric" id="asking_lp_principal">$0</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion expanded">
+                        <button class="accordion-header" onclick="this.parentElement.classList.toggle('expanded')">Debt & Cash Flow<div class="accordion-chevron"></div></button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="form-grid">
+                                    <div class="output-field"><span class="form-label">Total Debt</span><span class="output-value numeric" id="asking_total_debt">$0</span></div>
+                                    <div class="output-field"><span class="form-label">Total Debt Servicing</span><span class="output-value numeric" id="asking_total_servicing">$0</span></div>
+                                    <div class="output-field"><span class="form-label">Cash Flow</span><span class="output-value numeric" id="asking_cf">$0</span></div>
+                                    <div class="output-field"><span class="form-label">Owner Monthly</span><span class="output-value numeric" id="asking_owner_monthly">$0</span></div>
+                                    <div class="output-field"><span class="form-label">Owner Cash Flow</span><span class="output-value" id="asking_owner_cf">$0</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion expanded">
+                        <button class="accordion-header" onclick="this.parentElement.classList.toggle('expanded')">LP Returns<div class="accordion-chevron"></div></button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="form-grid">
+                                    <div class="output-field"><span class="form-label">LP Equity Investment</span><span class="output-value numeric" id="asking_lp_equity">$0</span></div>
+                                    <div class="output-field"><span class="form-label">LP Cash Flow Amount</span><span class="output-value numeric" id="asking_lp_cf_amount">$0</span></div>
+                                </div>
+                                <div class="form-grid" style="margin-top: 16px;">
+                                    <div class="output-field"><span class="form-label">LP Total Income (CF + Principal)</span><span class="output-value numeric" id="asking_lp_total_income">$0</span></div>
+                                    <div class="output-field"><span class="form-label">LP Cash on Cash %</span><span class="output-value" id="asking_lp_coc">0%</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h2 style="font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 20px;">Your Scenario</h2>
+                    <div class="hero-card" id="my_hero_card">
+                        <div class="hero-label">Annual Owner Cash Flow</div>
+                        <div class="hero-value" id="my_owner_cf_hero">$0</div>
+                        <div class="hero-subvalue"><span id="my_owner_monthly_hero">$0</span>/month</div>
+                    </div>
+
+                    <div class="accordion expanded">
+                        <button class="accordion-header" onclick="this.parentElement.classList.toggle('expanded')">Income Analysis<div class="accordion-chevron"></div></button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="form-grid full">
+                                    <div class="form-group"><label class="form-label">Gross Park Revenue (GPR)</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="my_gpr" class="currency-input" placeholder="Annual GPR" oninput="calculateAll()" value="0"></div></div>
+                                    <div class="form-group"><label class="form-label">Total Units</label><input type="number" id="my_units" placeholder="Units" oninput="calculateAll()" value="270"></div>
+                                    <div class="form-group"><label class="form-label">Occupied Units</label><input type="number" id="my_occupied" placeholder="Occupied" oninput="calculateAll()" value="270"></div>
+                                </div>
+                                <div class="form-grid" style="margin-top: 16px;">
+                                    <div class="output-field"><span class="form-label">Gross Income</span><span class="output-value" id="my_gross_income">$0</span></div>
+                                    <div class="output-field"><span class="form-label">Occupancy %</span><span class="output-value" id="my_occupancy_pct">0%</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion expanded">
+                        <button class="accordion-header" onclick="this.parentElement.classList.toggle('expanded')">Operating Expenses<div class="accordion-chevron"></div></button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="form-grid full">
+                                    <div class="form-group"><label class="form-label">Gross Operating Expenses</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="my_goe" class="currency-input" placeholder="GOE" oninput="calculateAll()" value="735000"></div></div>
+                                </div>
+                                <div class="form-grid" style="margin-top: 16px;">
+                                    <div class="output-field"><span class="form-label">GOE as % of Gross Income</span><span class="output-value" id="my_goe_pct">0%</span></div>
+                                    <div class="output-field"><span class="form-label">Net Operating Income</span><span class="output-value" id="my_noi">$0</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion expanded">
+                        <button class="accordion-header" onclick="this.parentElement.classList.toggle('expanded')">Purchase & Acquisition<div class="accordion-chevron"></div></button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="form-grid full">
+                                    <div class="form-group"><label class="form-label">Purchase Price</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="my_purchase" class="currency-input" placeholder="Purchase Price" oninput="calculateAll()" value="15000000"></div></div>
+                                </div>
+                                <div class="form-grid" style="margin-top: 16px;">
+                                    <div class="form-group"><label class="form-label">Acquisition Fee</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="my_acq_fee" class="currency-input" placeholder="Acq Fee" oninput="calculateAll()" value="50000"></div></div>
+                                    <div class="form-group"><label class="form-label">CapEx Reserve</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="my_capex" class="currency-input" placeholder="CapEx" oninput="calculateAll()" value="100000"></div></div>
+                                    <div class="form-group"><label class="form-label">Referral Fee</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="my_referral" class="currency-input" placeholder="Referral" oninput="calculateAll()" value="0"></div></div>
+                                    <div class="form-group"><label class="form-label">Closing Costs</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="my_closing" class="currency-input" placeholder="Closing" oninput="calculateAll()" value="75000"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion expanded">
+                        <button class="accordion-header" onclick="this.parentElement.classList.toggle('expanded')">Seller Financing<div class="accordion-chevron"></div></button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="form-grid full">
+                                    <div class="form-group"><label class="form-label">% Seller Finance</label><div class="form-group"><input type="number" id="my_sf_pct" placeholder="%" min="0" max="100" oninput="calculateAll()" value="60"><div class="range-slider-wrapper"><input type="range" id="my_sf_pct_slider" min="0" max="100" oninput="document.getElementById('my_sf_pct').value = this.value; calculateAll();" value="60"><div class="range-label"><span>0%</span><span>100%</span></div></div></div></div>
+                                    <div class="form-group"><label class="form-label">Seller Finance Amount</label><div class="output-field"><span class="output-value" id="my_sf_amount">$0</span></div></div>
+                                </div>
+                                <div class="form-grid" style="margin-top: 16px;">
+                                    <div class="form-group"><label class="form-label">Interest Rate (%)</label><div class="form-group"><input type="number" id="my_sf_rate" placeholder="Rate" min="0" max="15" step="0.1" oninput="calculateAll()" value="6"><div class="range-slider-wrapper"><input type="range" id="my_sf_rate_slider" min="0" max="15" step="0.1" oninput="document.getElementById('my_sf_rate').value = this.value; calculateAll();" value="6"><div class="range-label"><span>0%</span><span>15%</span></div></div></div></div>
+                                    <div class="form-group"><label class="form-label">Amortization (Years)</label><input type="number" id="my_sf_years" placeholder="Years" oninput="calculateAll()" value="30"></div>
+                                    <div class="form-group"><label class="form-label">Interest-Only (Years)</label><input type="number" id="my_sf_io" placeholder="IO Years" oninput="calculateAll()" value="0"></div>
+                                </div>
+                                <div class="form-grid" style="margin-top: 16px;">
+                                    <div class="output-field"><span class="form-label">Monthly Payment</span><span class="output-value numeric" id="my_sf_payment">$0</span></div>
+                                    <div class="output-field"><span class="form-label">Annual Interest</span><span class="output-value numeric" id="my_sf_interest">$0</span></div>
+                                    <div class="output-field"><span class="form-label">Annual Principal</span><span class="output-value numeric" id="my_sf_principal">$0</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion expanded">
+                        <button class="accordion-header" onclick="this.parentElement.classList.toggle('expanded')">Capital Requirements<div class="accordion-chevron"></div></button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="form-grid full">
+                                    <div class="form-group"><label class="form-label">Down Payment</label><div class="output-field"><span class="output-value numeric" id="my_down_payment">$0</span></div></div>
+                                    <div class="form-group"><label class="form-label">LP Equity Required</label><div class="output-field"><span class="output-value numeric" id="my_lp_capital">$0</span></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion expanded">
+                        <button class="accordion-header" onclick="this.parentElement.classList.toggle('expanded')">LP Debt Terms<div class="accordion-chevron"></div></button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="form-grid full">
+                                    <div class="form-group"><label class="form-label">LP Debt as % of Cash Flow</label><div class="form-group"><input type="number" id="my_lp_pct" placeholder="%" min="0" max="100" oninput="calculateAll()" value="80"><div class="range-slider-wrapper"><input type="range" id="my_lp_pct_slider" min="0" max="100" oninput="document.getElementById('my_lp_pct').value = this.value; calculateAll();" value="80"><div class="range-label"><span>0%</span><span>100%</span></div></div></div></div>
+                                </div>
+                                <div class="form-grid" style="margin-top: 16px;">
+                                    <div class="form-group"><label class="form-label">LP Interest Rate (%)</label><div class="form-group"><input type="number" id="my_lp_rate" placeholder="Rate" min="0" max="15" step="0.1" oninput="calculateAll()" value="6"><div class="range-slider-wrapper"><input type="range" id="my_lp_rate_slider" min="0" max="15" step="0.1" oninput="document.getElementById('my_lp_rate').value = this.value; calculateAll();" value="6"><div class="range-label"><span>0%</span><span>15%</span></div></div></div></div>
+                                    <div class="form-group"><label class="form-label">LP Amortization (Years)</label><input type="number" id="my_lp_years" placeholder="Years" oninput="calculateAll()" value="30"></div>
+                                    <div class="form-group"><label class="form-label">LP Interest-Only (Years)</label><input type="number" id="my_lp_io" placeholder="IO Years" oninput="calculateAll()" value="0"></div>
+                                </div>
+                                <div class="form-grid" style="margin-top: 16px;">
+                                    <div class="output-field"><span class="form-label">LP Monthly Payment</span><span class="output-value numeric" id="my_lp_payment">$0</span></div>
+                                    <div class="output-field"><span class="form-label">LP Annual Interest</span><span class="output-value numeric" id="my_lp_interest">$0</span></div>
+                                    <div class="output-field"><span class="form-label">LP Annual Principal</span><span class="output-value numeric" id="my_lp_principal">$0</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion expanded">
+                        <button class="accordion-header" onclick="this.parentElement.classList.toggle('expanded')">Debt & Cash Flow<div class="accordion-chevron"></div></button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="form-grid">
+                                    <div class="output-field"><span class="form-label">Total Debt</span><span class="output-value numeric" id="my_total_debt">$0</span></div>
+                                    <div class="output-field"><span class="form-label">Total Debt Servicing</span><span class="output-value numeric" id="my_total_servicing">$0</span></div>
+                                    <div class="output-field"><span class="form-label">Cash Flow</span><span class="output-value numeric" id="my_cf">$0</span></div>
+                                    <div class="output-field"><span class="form-label">Owner Monthly</span><span class="output-value numeric" id="my_owner_monthly">$0</span></div>
+                                    <div class="output-field"><span class="form-label">Owner Cash Flow</span><span class="output-value" id="my_owner_cf">$0</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion expanded">
+                        <button class="accordion-header" onclick="this.parentElement.classList.toggle('expanded')">LP Returns<div class="accordion-chevron"></div></button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="form-grid">
+                                    <div class="output-field"><span class="form-label">LP Equity Investment</span><span class="output-value numeric" id="my_lp_equity">$0</span></div>
+                                    <div class="output-field"><span class="form-label">LP Cash Flow Amount</span><span class="output-value numeric" id="my_lp_cf_amount">$0</span></div>
+                                </div>
+                                <div class="form-grid" style="margin-top: 16px;">
+                                    <div class="output-field"><span class="form-label">LP Total Income (CF + Principal)</span><span class="output-value numeric" id="my_lp_total_income">$0</span></div>
+                                    <div class="output-field"><span class="form-label">LP Cash on Cash %</span><span class="output-value" id="my_lp_coc">0%</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- FIVE YEAR ANALYSIS SECTION -->
-        <div class="five-year-section">
-            <div class="section-title five-year-title">Five Year Analysis</div>
-            <div class="five-year-content">
-                <table class="year-table">
+        <div id="five-year" class="tab-content">
+            <div class="chart-container">
+                <div class="chart-title">5-Year Financial Projections</div>
+                <div class="chart-legend">
+                    <div class="legend-item"><div class="legend-dot noi"></div><span>NOI</span></div>
+                    <div class="legend-item"><div class="legend-dot cash-flow"></div><span>Total Cash Flow</span></div>
+                    <div class="legend-item"><div class="legend-dot owner-cf"></div><span>Owner CF</span></div>
+                </div>
+                <svg id="projection-chart" viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg"></svg>
+            </div>
+
+            <div class="table-container">
+                <table>
                     <thead>
                         <tr>
                             <th></th>
@@ -573,10 +1017,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Occupancy Section -->
-                        <tr>
-                            <td class="section-header">Occupancy</td>
-                            <td></td><td></td><td></td><td></td><td></td>
+                        <tr class="section-header-row">
+                            <td colspan="6">Occupancy</td>
                         </tr>
                         <tr>
                             <td>Total Units</td>
@@ -596,17 +1038,15 @@
                         </tr>
                         <tr>
                             <td>Occupancy %</td>
-                            <td id="fy_occupancy_pct_1">100.0%</td>
-                            <td id="fy_occupancy_pct_2">100.0%</td>
-                            <td id="fy_occupancy_pct_3">100.0%</td>
-                            <td id="fy_occupancy_pct_4">100.0%</td>
-                            <td id="fy_occupancy_pct_5">100.0%</td>
+                            <td id="fy_occupancy_pct_1">100%</td>
+                            <td id="fy_occupancy_pct_2">100%</td>
+                            <td id="fy_occupancy_pct_3">100%</td>
+                            <td id="fy_occupancy_pct_4">100%</td>
+                            <td id="fy_occupancy_pct_5">100%</td>
                         </tr>
 
-                        <!-- Monthly Rents Section -->
-                        <tr>
-                            <td class="section-header">Monthly Rents</td>
-                            <td></td><td></td><td></td><td></td><td></td>
+                        <tr class="section-header-row">
+                            <td colspan="6">Monthly Rents</td>
                         </tr>
                         <tr>
                             <td>Avg Rent - Base</td>
@@ -618,11 +1058,11 @@
                         </tr>
                         <tr>
                             <td>Rent Growth %</td>
-                            <td class="editable-cell"><input type="number" id="fy_rent_growth_1" value="0" step="0.1" max="100">%</td>
-                            <td class="editable-cell"><input type="number" id="fy_rent_growth_2" value="0" step="0.1" max="100">%</td>
-                            <td class="editable-cell"><input type="number" id="fy_rent_growth_3" value="0" step="0.1" max="100">%</td>
-                            <td class="editable-cell"><input type="number" id="fy_rent_growth_4" value="0" step="0.1" max="100">%</td>
-                            <td class="editable-cell"><input type="number" id="fy_rent_growth_5" value="0" step="0.1" max="100">%</td>
+                            <td class="editable-cell"><input type="number" id="fy_rent_growth_1" value="0" step="0.1">%</td>
+                            <td class="editable-cell"><input type="number" id="fy_rent_growth_2" value="0" step="0.1">%</td>
+                            <td class="editable-cell"><input type="number" id="fy_rent_growth_3" value="0" step="0.1">%</td>
+                            <td class="editable-cell"><input type="number" id="fy_rent_growth_4" value="0" step="0.1">%</td>
+                            <td class="editable-cell"><input type="number" id="fy_rent_growth_5" value="0" step="0.1">%</td>
                         </tr>
                         <tr>
                             <td>Avg Rent - New</td>
@@ -633,240 +1073,220 @@
                             <td id="fy_rent_new_5">$648</td>
                         </tr>
 
-                        <!-- Annual Profit & Loss Section -->
-                        <tr>
-                            <td class="section-header">Annual Profit & Loss</td>
-                            <td></td><td></td><td></td><td></td><td></td>
+                        <tr class="section-header-row">
+                            <td colspan="6">Annual Profit & Loss</td>
                         </tr>
                         <tr>
                             <td>Gross Rent</td>
-                            <td id="fy_gross_rent_1">$2,100,000</td>
-                            <td id="fy_gross_rent_2">$2,100,000</td>
-                            <td id="fy_gross_rent_3">$2,100,000</td>
-                            <td id="fy_gross_rent_4">$2,100,000</td>
-                            <td id="fy_gross_rent_5">$2,100,000</td>
+                            <td id="fy_gross_rent_1">$0</td>
+                            <td id="fy_gross_rent_2">$0</td>
+                            <td id="fy_gross_rent_3">$0</td>
+                            <td id="fy_gross_rent_4">$0</td>
+                            <td id="fy_gross_rent_5">$0</td>
                         </tr>
                         <tr>
                             <td>GOE Ratio %</td>
-                            <td class="editable-cell"><input type="number" id="fy_goe_ratio_1" value="35" step="0.1" max="100">%</td>
-                            <td class="editable-cell"><input type="number" id="fy_goe_ratio_2" value="35" step="0.1" max="100">%</td>
-                            <td class="editable-cell"><input type="number" id="fy_goe_ratio_3" value="35" step="0.1" max="100">%</td>
-                            <td class="editable-cell"><input type="number" id="fy_goe_ratio_4" value="35" step="0.1" max="100">%</td>
-                            <td class="editable-cell"><input type="number" id="fy_goe_ratio_5" value="35" step="0.1" max="100">%</td>
+                            <td class="editable-cell"><input type="number" id="fy_goe_ratio_1" value="35" step="1">%</td>
+                            <td class="editable-cell"><input type="number" id="fy_goe_ratio_2" value="35" step="1">%</td>
+                            <td class="editable-cell"><input type="number" id="fy_goe_ratio_3" value="35" step="1">%</td>
+                            <td class="editable-cell"><input type="number" id="fy_goe_ratio_4" value="35" step="1">%</td>
+                            <td class="editable-cell"><input type="number" id="fy_goe_ratio_5" value="35" step="1">%</td>
                         </tr>
                         <tr>
                             <td>GOE Amount</td>
-                            <td id="fy_goe_amount_1">$735,000</td>
-                            <td id="fy_goe_amount_2">$735,000</td>
-                            <td id="fy_goe_amount_3">$735,000</td>
-                            <td id="fy_goe_amount_4">$735,000</td>
-                            <td id="fy_goe_amount_5">$735,000</td>
+                            <td id="fy_goe_amount_1">$0</td>
+                            <td id="fy_goe_amount_2">$0</td>
+                            <td id="fy_goe_amount_3">$0</td>
+                            <td id="fy_goe_amount_4">$0</td>
+                            <td id="fy_goe_amount_5">$0</td>
                         </tr>
                         <tr>
                             <td>NOI</td>
-                            <td id="fy_noi_1">$1,365,000</td>
-                            <td id="fy_noi_2">$1,365,000</td>
-                            <td id="fy_noi_3">$1,365,000</td>
-                            <td id="fy_noi_4">$1,365,000</td>
-                            <td id="fy_noi_5">$1,365,000</td>
+                            <td id="fy_noi_1">$0</td>
+                            <td id="fy_noi_2">$0</td>
+                            <td id="fy_noi_3">$0</td>
+                            <td id="fy_noi_4">$0</td>
+                            <td id="fy_noi_5">$0</td>
                         </tr>
 
-                        <!-- Valuation Section -->
-                        <tr>
-                            <td class="section-header">Valuation</td>
-                            <td></td><td></td><td></td><td></td><td></td>
+                        <tr class="section-header-row">
+                            <td colspan="6">Valuation</td>
                         </tr>
                         <tr>
                             <td>Cap Rate %</td>
-                            <td class="editable-cell"><input type="number" id="fy_cap_rate_1" value="8" step="0.1" max="100">%</td>
-                            <td class="editable-cell"><input type="number" id="fy_cap_rate_2" value="8" step="0.1" max="100">%</td>
-                            <td class="editable-cell"><input type="number" id="fy_cap_rate_3" value="8" step="0.1" max="100">%</td>
-                            <td class="editable-cell"><input type="number" id="fy_cap_rate_4" value="8" step="0.1" max="100">%</td>
-                            <td class="editable-cell"><input type="number" id="fy_cap_rate_5" value="8" step="0.1" max="100">%</td>
+                            <td class="editable-cell"><input type="number" id="fy_cap_rate_1" value="9" step="0.1">%</td>
+                            <td class="editable-cell"><input type="number" id="fy_cap_rate_2" value="9" step="0.1">%</td>
+                            <td class="editable-cell"><input type="number" id="fy_cap_rate_3" value="9" step="0.1">%</td>
+                            <td class="editable-cell"><input type="number" id="fy_cap_rate_4" value="9" step="0.1">%</td>
+                            <td class="editable-cell"><input type="number" id="fy_cap_rate_5" value="9" step="0.1">%</td>
                         </tr>
                         <tr>
-                            <td>Cap Rate Valuation</td>
-                            <td id="fy_valuation_1">$17,062,500</td>
-                            <td id="fy_valuation_2">$17,062,500</td>
-                            <td id="fy_valuation_3">$17,062,500</td>
-                            <td id="fy_valuation_4">$17,062,500</td>
-                            <td id="fy_valuation_5">$17,062,500</td>
+                            <td>Valuation</td>
+                            <td id="fy_valuation_1">$0</td>
+                            <td id="fy_valuation_2">$0</td>
+                            <td id="fy_valuation_3">$0</td>
+                            <td id="fy_valuation_4">$0</td>
+                            <td id="fy_valuation_5">$0</td>
                         </tr>
                         <tr>
-                            <td>Change in Value</td>
-                            <td id="fy_value_change_1">$2,062,500</td>
-                            <td id="fy_value_change_2">$2,062,500</td>
-                            <td id="fy_value_change_3">$2,062,500</td>
-                            <td id="fy_value_change_4">$2,062,500</td>
-                            <td id="fy_value_change_5">$2,062,500</td>
+                            <td>Value Change</td>
+                            <td id="fy_value_change_1">$0</td>
+                            <td id="fy_value_change_2">$0</td>
+                            <td id="fy_value_change_3">$0</td>
+                            <td id="fy_value_change_4">$0</td>
+                            <td id="fy_value_change_5">$0</td>
                         </tr>
                         <tr>
-                            <td>Loan LTV %</td>
-                            <td id="fy_ltv_1">89.2%</td>
-                            <td id="fy_ltv_2">89.2%</td>
-                            <td id="fy_ltv_3">89.2%</td>
-                            <td id="fy_ltv_4">89.2%</td>
-                            <td id="fy_ltv_5">89.2%</td>
+                            <td>LTV</td>
+                            <td id="fy_ltv_1">0%</td>
+                            <td id="fy_ltv_2">0%</td>
+                            <td id="fy_ltv_3">0%</td>
+                            <td id="fy_ltv_4">0%</td>
+                            <td id="fy_ltv_5">0%</td>
                         </tr>
 
-                        <!-- Seller Debt Servicing Section -->
-                        <tr>
-                            <td class="section-header">Seller Debt Servicing</td>
-                            <td></td><td></td><td></td><td></td><td></td>
+                        <tr class="section-header-row">
+                            <td colspan="6">Debt Servicing</td>
                         </tr>
                         <tr>
-                            <td>SF Debt Amount</td>
-                            <td id="fy_sf_debt_1">$9,000,000</td>
-                            <td id="fy_sf_debt_2">$9,000,000</td>
-                            <td id="fy_sf_debt_3">$9,000,000</td>
-                            <td id="fy_sf_debt_4">$9,000,000</td>
-                            <td id="fy_sf_debt_5">$9,000,000</td>
+                            <td>SF Debt</td>
+                            <td id="fy_sf_debt_1">$0</td>
+                            <td id="fy_sf_debt_2">$0</td>
+                            <td id="fy_sf_debt_3">$0</td>
+                            <td id="fy_sf_debt_4">$0</td>
+                            <td id="fy_sf_debt_5">$0</td>
                         </tr>
                         <tr>
-                            <td>SF Interest Payment</td>
-                            <td id="fy_sf_interest_1">$540,000</td>
-                            <td id="fy_sf_interest_2">$540,000</td>
-                            <td id="fy_sf_interest_3">$540,000</td>
-                            <td id="fy_sf_interest_4">$540,000</td>
-                            <td id="fy_sf_interest_5">$540,000</td>
+                            <td>SF Interest</td>
+                            <td id="fy_sf_interest_1">$0</td>
+                            <td id="fy_sf_interest_2">$0</td>
+                            <td id="fy_sf_interest_3">$0</td>
+                            <td id="fy_sf_interest_4">$0</td>
+                            <td id="fy_sf_interest_5">$0</td>
                         </tr>
                         <tr>
-                            <td>SF Principal Payment</td>
+                            <td>SF Principal</td>
                             <td id="fy_sf_principal_1">$0</td>
                             <td id="fy_sf_principal_2">$0</td>
                             <td id="fy_sf_principal_3">$0</td>
                             <td id="fy_sf_principal_4">$0</td>
                             <td id="fy_sf_principal_5">$0</td>
                         </tr>
-
-                        <!-- LP Debt Servicing Section -->
                         <tr>
-                            <td class="section-header">LP Debt Servicing</td>
-                            <td></td><td></td><td></td><td></td><td></td>
+                            <td>LP Debt</td>
+                            <td id="fy_lp_debt_1">$0</td>
+                            <td id="fy_lp_debt_2">$0</td>
+                            <td id="fy_lp_debt_3">$0</td>
+                            <td id="fy_lp_debt_4">$0</td>
+                            <td id="fy_lp_debt_5">$0</td>
                         </tr>
                         <tr>
-                            <td>LP Debt Amount</td>
-                            <td id="fy_lp_debt_1">$6,225,000</td>
-                            <td id="fy_lp_debt_2">$6,225,000</td>
-                            <td id="fy_lp_debt_3">$6,225,000</td>
-                            <td id="fy_lp_debt_4">$6,225,000</td>
-                            <td id="fy_lp_debt_5">$6,225,000</td>
+                            <td>LP Interest</td>
+                            <td id="fy_lp_interest_1">$0</td>
+                            <td id="fy_lp_interest_2">$0</td>
+                            <td id="fy_lp_interest_3">$0</td>
+                            <td id="fy_lp_interest_4">$0</td>
+                            <td id="fy_lp_interest_5">$0</td>
                         </tr>
                         <tr>
-                            <td>LP Interest Payment</td>
-                            <td id="fy_lp_interest_1">$373,500</td>
-                            <td id="fy_lp_interest_2">$373,500</td>
-                            <td id="fy_lp_interest_3">$373,500</td>
-                            <td id="fy_lp_interest_4">$373,500</td>
-                            <td id="fy_lp_interest_5">$373,500</td>
-                        </tr>
-                        <tr>
-                            <td>LP Principal Payment</td>
+                            <td>LP Principal</td>
                             <td id="fy_lp_principal_1">$0</td>
                             <td id="fy_lp_principal_2">$0</td>
                             <td id="fy_lp_principal_3">$0</td>
                             <td id="fy_lp_principal_4">$0</td>
                             <td id="fy_lp_principal_5">$0</td>
                         </tr>
-
-                        <!-- Total Debt Servicing Section -->
-                        <tr>
-                            <td class="section-header">Total Debt Servicing</td>
-                            <td></td><td></td><td></td><td></td><td></td>
-                        </tr>
                         <tr>
                             <td>Total Debt</td>
-                            <td id="fy_total_debt_1">$15,225,000</td>
-                            <td id="fy_total_debt_2">$15,225,000</td>
-                            <td id="fy_total_debt_3">$15,225,000</td>
-                            <td id="fy_total_debt_4">$15,225,000</td>
-                            <td id="fy_total_debt_5">$15,225,000</td>
+                            <td id="fy_total_debt_1">$0</td>
+                            <td id="fy_total_debt_2">$0</td>
+                            <td id="fy_total_debt_3">$0</td>
+                            <td id="fy_total_debt_4">$0</td>
+                            <td id="fy_total_debt_5">$0</td>
                         </tr>
                         <tr>
                             <td>Total Debt Servicing</td>
-                            <td id="fy_total_servicing_1">$913,500</td>
-                            <td id="fy_total_servicing_2">$913,500</td>
-                            <td id="fy_total_servicing_3">$913,500</td>
-                            <td id="fy_total_servicing_4">$913,500</td>
-                            <td id="fy_total_servicing_5">$913,500</td>
+                            <td id="fy_total_servicing_1">$0</td>
+                            <td id="fy_total_servicing_2">$0</td>
+                            <td id="fy_total_servicing_3">$0</td>
+                            <td id="fy_total_servicing_4">$0</td>
+                            <td id="fy_total_servicing_5">$0</td>
                         </tr>
 
-                        <!-- Cash Flow Section -->
-                        <tr>
-                            <td class="section-header">Cash Flow Analysis</td>
-                            <td></td><td></td><td></td><td></td><td></td>
+                        <tr class="section-header-row">
+                            <td colspan="6">Cash Flow</td>
                         </tr>
                         <tr>
                             <td>Total Cash Flow</td>
-                            <td id="fy_total_cf_1">$451,500</td>
-                            <td id="fy_total_cf_2">$451,500</td>
-                            <td id="fy_total_cf_3">$451,500</td>
-                            <td id="fy_total_cf_4">$451,500</td>
-                            <td id="fy_total_cf_5">$451,500</td>
+                            <td id="fy_total_cf_1">$0</td>
+                            <td id="fy_total_cf_2">$0</td>
+                            <td id="fy_total_cf_3">$0</td>
+                            <td id="fy_total_cf_4">$0</td>
+                            <td id="fy_total_cf_5">$0</td>
                         </tr>
                         <tr>
-                            <td>LP Share of Cash Flow %</td>
-                            <td id="fy_lp_share_pct_1">80.0%</td>
-                            <td id="fy_lp_share_pct_2">80.0%</td>
-                            <td id="fy_lp_share_pct_3">80.0%</td>
-                            <td id="fy_lp_share_pct_4">80.0%</td>
-                            <td id="fy_lp_share_pct_5">80.0%</td>
+                            <td>LP Share %</td>
+                            <td id="fy_lp_share_pct_1">0%</td>
+                            <td id="fy_lp_share_pct_2">0%</td>
+                            <td id="fy_lp_share_pct_3">0%</td>
+                            <td id="fy_lp_share_pct_4">0%</td>
+                            <td id="fy_lp_share_pct_5">0%</td>
                         </tr>
                         <tr>
                             <td>LP Cash Flow</td>
-                            <td id="fy_lp_cf_1">$361,200</td>
-                            <td id="fy_lp_cf_2">$361,200</td>
-                            <td id="fy_lp_cf_3">$361,200</td>
-                            <td id="fy_lp_cf_4">$361,200</td>
-                            <td id="fy_lp_cf_5">$361,200</td>
+                            <td id="fy_lp_cf_1">$0</td>
+                            <td id="fy_lp_cf_2">$0</td>
+                            <td id="fy_lp_cf_3">$0</td>
+                            <td id="fy_lp_cf_4">$0</td>
+                            <td id="fy_lp_cf_5">$0</td>
                         </tr>
                         <tr>
-                            <td>LP P&I Payments</td>
-                            <td id="fy_lp_pi_1">$373,500</td>
-                            <td id="fy_lp_pi_2">$373,500</td>
-                            <td id="fy_lp_pi_3">$373,500</td>
-                            <td id="fy_lp_pi_4">$373,500</td>
-                            <td id="fy_lp_pi_5">$373,500</td>
+                            <td>LP P&I</td>
+                            <td id="fy_lp_pi_1">$0</td>
+                            <td id="fy_lp_pi_2">$0</td>
+                            <td id="fy_lp_pi_3">$0</td>
+                            <td id="fy_lp_pi_4">$0</td>
+                            <td id="fy_lp_pi_5">$0</td>
                         </tr>
                         <tr>
                             <td>LP Total Income</td>
-                            <td id="fy_lp_total_income_1">$734,700</td>
-                            <td id="fy_lp_total_income_2">$734,700</td>
-                            <td id="fy_lp_total_income_3">$734,700</td>
-                            <td id="fy_lp_total_income_4">$734,700</td>
-                            <td id="fy_lp_total_income_5">$734,700</td>
+                            <td id="fy_lp_total_income_1">$0</td>
+                            <td id="fy_lp_total_income_2">$0</td>
+                            <td id="fy_lp_total_income_3">$0</td>
+                            <td id="fy_lp_total_income_4">$0</td>
+                            <td id="fy_lp_total_income_5">$0</td>
                         </tr>
                         <tr>
-                            <td class="highlight-cell">Owner Cash Flow</td>
-                            <td class="highlight-cell" id="fy_owner_cf_1">$90,300</td>
-                            <td class="highlight-cell" id="fy_owner_cf_2">$90,300</td>
-                            <td class="highlight-cell" id="fy_owner_cf_3">$90,300</td>
-                            <td class="highlight-cell" id="fy_owner_cf_4">$90,300</td>
-                            <td class="highlight-cell" id="fy_owner_cf_5">$90,300</td>
+                            <td>Owner Cash Flow</td>
+                            <td id="fy_owner_cf_1">$0</td>
+                            <td id="fy_owner_cf_2">$0</td>
+                            <td id="fy_owner_cf_3">$0</td>
+                            <td id="fy_owner_cf_4">$0</td>
+                            <td id="fy_owner_cf_5">$0</td>
                         </tr>
                         <tr>
-                            <td>Owner Monthly Amount</td>
-                            <td id="fy_owner_monthly_1">$7,525</td>
-                            <td id="fy_owner_monthly_2">$7,525</td>
-                            <td id="fy_owner_monthly_3">$7,525</td>
-                            <td id="fy_owner_monthly_4">$7,525</td>
-                            <td id="fy_owner_monthly_5">$7,525</td>
+                            <td>Owner Monthly</td>
+                            <td id="fy_owner_monthly_1">$0</td>
+                            <td id="fy_owner_monthly_2">$0</td>
+                            <td id="fy_owner_monthly_3">$0</td>
+                            <td id="fy_owner_monthly_4">$0</td>
+                            <td id="fy_owner_monthly_5">$0</td>
                         </tr>
                         <tr>
-                            <td>Partners (Count)</td>
-                            <td class="editable-cell"><input type="number" id="fy_partners_1" value="10" step="1" min="1"></td>
-                            <td class="editable-cell"><input type="number" id="fy_partners_2" value="10" step="1" min="1"></td>
-                            <td class="editable-cell"><input type="number" id="fy_partners_3" value="10" step="1" min="1"></td>
-                            <td class="editable-cell"><input type="number" id="fy_partners_4" value="10" step="1" min="1"></td>
-                            <td class="editable-cell"><input type="number" id="fy_partners_5" value="10" step="1" min="1"></td>
+                            <td>Number of Partners</td>
+                            <td class="editable-cell"><input type="number" id="fy_partners_1" value="1" step="1"></td>
+                            <td class="editable-cell"><input type="number" id="fy_partners_2" value="1" step="1"></td>
+                            <td class="editable-cell"><input type="number" id="fy_partners_3" value="1" step="1"></td>
+                            <td class="editable-cell"><input type="number" id="fy_partners_4" value="1" step="1"></td>
+                            <td class="editable-cell"><input type="number" id="fy_partners_5" value="1" step="1"></td>
                         </tr>
                         <tr>
-                            <td>Monthly Per Partner</td>
-                            <td id="fy_per_partner_1">$753</td>
-                            <td id="fy_per_partner_2">$753</td>
-                            <td id="fy_per_partner_3">$753</td>
-                            <td id="fy_per_partner_4">$753</td>
-                            <td id="fy_per_partner_5">$753</td>
+                            <td>Per Partner Monthly</td>
+                            <td id="fy_per_partner_1">$0</td>
+                            <td id="fy_per_partner_2">$0</td>
+                            <td id="fy_per_partner_3">$0</td>
+                            <td id="fy_per_partner_4">$0</td>
+                            <td id="fy_per_partner_5">$0</td>
                         </tr>
                     </tbody>
                 </table>
@@ -875,184 +1295,238 @@
     </div>
 
     <script>
-        // Financial Functions
         function PMT(rate, nper, pv) {
             if (rate === 0) return -pv / nper;
-            return -pv * rate / (1 - Math.pow(1 + rate, -nper));
+            const factor = Math.pow(1 + rate, nper);
+            return -(pv * rate * factor) / (factor - 1);
         }
 
         function IPMT(rate, per, nper, pv) {
-            if (rate === 0) return 0;
-            var pmt = PMT(rate, nper, pv);
-            var fv = pv * Math.pow(1 + rate, per - 1) + pmt * ((Math.pow(1 + rate, per - 1) - 1) / rate);
-            return fv * rate;
+            const payment = PMT(rate, nper, pv);
+            let balance = pv;
+            for (let i = 1; i < per; i++) {
+                balance = balance * (1 + rate) + payment;
+            }
+            return balance * rate;
         }
 
         function PPMT(rate, per, nper, pv) {
-            return PMT(rate, nper, pv) - IPMT(rate, per, nper, pv);
+            const payment = PMT(rate, nper, pv);
+            const interest = IPMT(rate, per, nper, pv);
+            return payment - interest;
         }
 
-        // Utility Functions
         function formatCurrency(value) {
-            if (isNaN(value)) return '$0';
+            if (value === 0 || value === undefined) return '$0';
             return '$' + Math.round(value).toLocaleString();
         }
 
         function formatPercent(value) {
-            if (isNaN(value)) return '0.0%';
-            return (value * 100).toFixed(1) + '%';
+            if (value === 0 || value === undefined) return '0%';
+            return (Math.round(value * 10) / 10).toFixed(1) + '%';
         }
 
         function getInputValue(id) {
             const el = document.getElementById(id);
-            return parseFloat(el.value) || 0;
+            return el ? parseFloat(el.value) || 0 : 0;
         }
 
-        function getDropdownValue(id) {
-            return document.getElementById(id).value;
+        function setText(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
         }
 
-        function setText(id, value) {
-            document.getElementById(id).textContent = value;
-        }
-
-        // Main Calculation Engine
-        function calculateAll() {
-            calculatePurchaseAnalysis('asking');
-            calculatePurchaseAnalysis('my');
-            calculateFiveYear();
+        function syncSliders(scenario) {
+            const pairs = [[scenario + '_sf_pct', scenario + '_sf_pct_slider'], [scenario + '_sf_rate', scenario + '_sf_rate_slider'], [scenario + '_lp_pct', scenario + '_lp_pct_slider'], [scenario + '_lp_rate', scenario + '_lp_rate_slider']];
+            pairs.forEach(([inputId, sliderId]) => {
+                const input = document.getElementById(inputId);
+                const slider = document.getElementById(sliderId);
+                if (input && slider) {
+                    input.addEventListener('change', () => { slider.value = input.value; });
+                    slider.addEventListener('change', () => { input.value = slider.value; });
+                }
+            });
         }
 
         function calculatePurchaseAnalysis(scenario) {
-            const prefix = scenario + '_';
+            const gpr = getInputValue(scenario + '_gpr');
+            const units = getInputValue(scenario + '_units');
+            const occupied = getInputValue(scenario + '_occupied');
+            const goe = getInputValue(scenario + '_goe');
+            const purchase = getInputValue(scenario + '_purchase');
+            const sf_pct = getInputValue(scenario + '_sf_pct');
+            const sf_rate = getInputValue(scenario + '_sf_rate') / 100;
+            const sf_years = getInputValue(scenario + '_sf_years');
+            const sf_io = getInputValue(scenario + '_sf_io');
+            const acq_fee = getInputValue(scenario + '_acq_fee');
+            const capex = getInputValue(scenario + '_capex');
+            const referral = getInputValue(scenario + '_referral');
+            const closing = getInputValue(scenario + '_closing');
+            const lp_pct = getInputValue(scenario + '_lp_pct');
+            const lp_rate = getInputValue(scenario + '_lp_rate') / 100;
+            const lp_years = getInputValue(scenario + '_lp_years');
+            const lp_io = getInputValue(scenario + '_lp_io');
 
-            // Get input values
-            const gpr = getInputValue(prefix + 'gpr');
-            const units = getInputValue(prefix + 'units');
-            const occupied = getInputValue(prefix + 'occupied');
-            const goe_amount = getInputValue(prefix + 'goe');
-            const purchase = getInputValue(prefix + 'purchase');
-            const sf_pct = getInputValue(prefix + 'sf_pct') / 100;
-            const sf_rate = getInputValue(prefix + 'sf_rate') / 100;
-            const sf_years = getInputValue(prefix + 'sf_years');
-            const sf_io = getDropdownValue(prefix + 'sf_io');
-            const lp_rate = getInputValue(prefix + 'lp_rate') / 100;
-            const lp_years = getInputValue(prefix + 'lp_years');
-            const lp_io = getDropdownValue(prefix + 'lp_io');
-            const acq_fee = getInputValue(prefix + 'acq_fee');
-            const capex = getInputValue(prefix + 'capex');
-            const referral = getInputValue(prefix + 'referral');
-            const closing = getInputValue(prefix + 'closing');
-            const lp_pct = getInputValue(prefix + 'lp_pct') / 100;
+            const data = window[scenario + '_data'] = {};
 
-            // Income Analysis
-            let gross_income = gpr;
-            if (gross_income === 0 && occupied > 0) {
-                // Estimate from occupied units if GPR not provided
-                gross_income = 2100000; // Default based on original
-            }
-            setText(prefix + 'gross_income', formatCurrency(gross_income));
+            data.occupancy = units > 0 ? occupied / units : 0;
+            data.gross_income = gpr;
+            setText(scenario + '_gross_income', formatCurrency(data.gross_income));
+            setText(scenario + '_occupancy_pct', formatPercent(data.occupancy * 100));
 
-            const goe_pct = gross_income > 0 ? goe_amount / gross_income : 0;
-            setText(prefix + 'goe_pct', formatPercent(goe_pct));
+            data.goe_pct = data.gross_income > 0 ? goe / data.gross_income : 0;
+            data.noi = data.gross_income - goe;
+            setText(scenario + '_goe_pct', formatPercent(data.goe_pct * 100));
+            setText(scenario + '_noi', formatCurrency(data.noi));
 
-            const noi = gross_income - goe_amount;
-            setText(prefix + 'noi', formatCurrency(noi));
+            data.sf_amount = purchase * (sf_pct / 100);
+            setText(scenario + '_sf_amount', formatCurrency(data.sf_amount));
 
-            // Seller Financing
-            const sf_amount = purchase * sf_pct;
-            setText(prefix + 'sf_amount', formatCurrency(sf_amount));
+            const sf_nper = sf_years * 12;
+            const sf_rate_monthly = sf_rate / 12;
+            const sf_io_months = sf_io * 12;
 
-            let sf_payment, sf_interest, sf_principal;
-            if (sf_io === 'Yes') {
-                sf_payment = sf_amount * sf_rate;
-                sf_interest = sf_payment;
-                sf_principal = 0;
+            let sf_monthly_payment = 0;
+            let sf_annual_interest = 0;
+            let sf_annual_principal = 0;
+
+            if (sf_io_months > 0) {
+                sf_monthly_payment = (data.sf_amount * sf_rate_monthly);
+                sf_annual_interest = sf_monthly_payment * 12;
+                sf_annual_principal = 0;
             } else {
-                sf_payment = PMT(sf_rate, sf_years, sf_amount);
-                sf_interest = IPMT(sf_rate, 1, sf_years, sf_amount);
-                sf_principal = PPMT(sf_rate, 1, sf_years, sf_amount);
+                sf_monthly_payment = PMT(sf_rate_monthly, sf_nper, -data.sf_amount);
+                for (let i = 1; i <= 12; i++) {
+                    sf_annual_interest += IPMT(sf_rate_monthly, i, sf_nper, -data.sf_amount);
+                    sf_annual_principal += PPMT(sf_rate_monthly, i, sf_nper, -data.sf_amount);
+                }
             }
 
-            setText(prefix + 'sf_payment', formatCurrency(sf_payment));
-            setText(prefix + 'sf_interest', formatCurrency(sf_interest));
-            setText(prefix + 'sf_principal', formatCurrency(sf_principal));
+            setText(scenario + '_sf_payment', formatCurrency(sf_monthly_payment));
+            setText(scenario + '_sf_interest', formatCurrency(sf_annual_interest));
+            setText(scenario + '_sf_principal', formatCurrency(sf_annual_principal));
 
-            // Capital Requirements
-            const down_payment = purchase - sf_amount;
-            setText(prefix + 'down_payment', formatCurrency(down_payment));
+            data.sf_annual_servicing = sf_monthly_payment * 12;
 
-            const lp_capital = down_payment + acq_fee + capex + referral + closing;
-            setText(prefix + 'lp_capital', formatCurrency(lp_capital));
+            data.down_payment = purchase - data.sf_amount;
+            setText(scenario + '_down_payment', formatCurrency(data.down_payment));
 
-            // LP Debt Terms
-            let lp_payment, lp_interest, lp_principal;
-            if (lp_io === 'Yes') {
-                lp_payment = lp_capital * lp_rate;
-                lp_interest = lp_payment;
-                lp_principal = 0;
-            } else {
-                lp_payment = PMT(lp_rate, lp_years, lp_capital);
-                lp_interest = IPMT(lp_rate, 1, lp_years, lp_capital);
-                lp_principal = PPMT(lp_rate, 1, lp_years, lp_capital);
+            data.total_capital = data.down_payment + acq_fee + capex + referral + closing;
+            data.lp_capital = data.total_capital;
+            setText(scenario + '_lp_capital', formatCurrency(data.lp_capital));
+
+            data.lp_debt = Math.max(0, data.noi * (lp_pct / 100));
+
+            const lp_nper = lp_years * 12;
+            const lp_rate_monthly = lp_rate / 12;
+            const lp_io_months = lp_io * 12;
+
+            let lp_monthly_payment = 0;
+            let lp_annual_interest = 0;
+            let lp_annual_principal = 0;
+
+            if (data.lp_debt > 0) {
+                if (lp_io_months > 0) {
+                    lp_monthly_payment = (data.lp_debt * lp_rate_monthly);
+                    lp_annual_interest = lp_monthly_payment * 12;
+                    lp_annual_principal = 0;
+                } else {
+                    lp_monthly_payment = PMT(lp_rate_monthly, lp_nper, -data.lp_debt);
+                    for (let i = 1; i <= 12; i++) {
+                        lp_annual_interest += IPMT(lp_rate_monthly, i, lp_nper, -data.lp_debt);
+                        lp_annual_principal += PPMT(lp_rate_monthly, i, lp_nper, -data.lp_debt);
+                    }
+                }
             }
 
-            setText(prefix + 'lp_payment', formatCurrency(lp_payment));
-            setText(prefix + 'lp_interest', formatCurrency(lp_interest));
-            setText(prefix + 'lp_principal', formatCurrency(lp_principal));
+            setText(scenario + '_lp_payment', formatCurrency(lp_monthly_payment));
+            setText(scenario + '_lp_interest', formatCurrency(lp_annual_interest));
+            setText(scenario + '_lp_principal', formatCurrency(lp_annual_principal));
 
-            // Total Debt & Cash Flow
-            const total_debt = sf_amount + lp_capital;
-            setText(prefix + 'total_debt', formatCurrency(total_debt));
+            data.lp_annual_servicing = lp_monthly_payment * 12;
 
-            const total_servicing = sf_payment + lp_payment;
-            setText(prefix + 'total_servicing', formatCurrency(total_servicing));
+            data.total_debt = data.sf_amount + data.lp_debt;
+            data.total_servicing = data.sf_annual_servicing + data.lp_annual_servicing;
+            setText(scenario + '_total_servicing', formatCurrency(data.total_servicing));
 
-            const cf = noi - total_servicing;
-            setText(prefix + 'cf', formatCurrency(cf));
+            data.owner_cf = data.noi - data.total_servicing;
+            data.owner_monthly_cf = data.owner_cf / 12;
 
-            // LP Returns
-            const lp_cf_amount = cf * lp_pct;
-            setText(prefix + 'lp_cf_amount', formatCurrency(lp_cf_amount));
+            setText(scenario + '_owner_cf', formatCurrency(data.owner_cf));
 
-            const lp_total_income = lp_payment + lp_cf_amount;
-            setText(prefix + 'lp_total_income', formatCurrency(lp_total_income));
+            const ownerCfEl = document.getElementById(scenario + '_owner_cf');
+            if (ownerCfEl) {
+                ownerCfEl.classList.remove('positive', 'negative');
+                if (data.owner_cf >= 0) {
+                    ownerCfEl.classList.add('positive');
+                } else {
+                    ownerCfEl.classList.add('negative');
+                }
+            }
 
-            const lp_coc = lp_capital > 0 ? lp_total_income / lp_capital : 0;
-            setText(prefix + 'lp_coc', formatPercent(lp_coc));
+            const heroCard = document.getElementById(scenario + '_hero_card');
+            if (heroCard) {
+                heroCard.classList.remove('negative');
+                if (data.owner_cf < 0) {
+                    heroCard.classList.add('negative');
+                }
+            }
 
-            // Owner Returns
-            const owner_cf = cf * (1 - lp_pct);
-            setText(prefix + 'owner_cf', formatCurrency(owner_cf));
+            setText(scenario + '_owner_cf_hero', formatCurrency(data.owner_cf));
+            setText(scenario + '_owner_monthly_hero', formatCurrency(data.owner_monthly_cf));
 
-            const owner_monthly = owner_cf / 12;
-            setText(prefix + 'owner_monthly', formatCurrency(owner_monthly));
+            data.lp_equity = data.lp_capital;
+            data.lp_cf_amount = Math.max(0, data.owner_cf * (lp_pct / 100 / 100));
+            data.lp_total_income = data.lp_cf_amount + lp_annual_principal;
+            data.lp_coc = data.lp_equity > 0 ? (data.lp_cf_amount / data.lp_equity) * 100 : 0;
 
-            // Store for Five Year use
-            window[scenario + '_data'] = {
-                noi: noi,
-                gross_income: gross_income,
-                units: units,
-                occupied: occupied,
-                sf_amount: sf_amount,
-                sf_interest: sf_interest,
-                sf_principal: sf_principal,
-                lp_capital: lp_capital,
-                lp_interest: lp_interest,
-                lp_principal: lp_principal,
-                total_debt: total_debt,
-                purchase: purchase,
-                lp_pct: lp_pct,
-                lp_equity: getDropdownValue(prefix + 'lp_equity')
-            };
+            setText(scenario + '_lp_equity', formatCurrency(data.lp_equity));
+            setText(scenario + '_lp_cf_amount', formatCurrency(data.lp_cf_amount));
+            setText(scenario + '_lp_total_income', formatCurrency(data.lp_total_income));
+
+            const lpCoCEl = document.getElementById(scenario + '_lp_coc');
+            if (lpCoCEl) {
+                lpCoCEl.classList.remove('positive', 'warning', 'negative');
+                if (data.lp_coc > 8) {
+                    lpCoCEl.classList.add('positive');
+                } else if (data.lp_coc > 5) {
+                    lpCoCEl.classList.add('warning');
+                } else {
+                    lpCoCEl.classList.add('negative');
+                }
+            }
+
+            setText(scenario + '_lp_coc', formatPercent(data.lp_coc));
+
+            // Add new fields
+            data.units = units;
+            data.occupied = occupied;
+            data.purchase = purchase;
+            data.sf_amount = data.sf_amount;
+            data.sf_interest = sf_annual_interest;
+            data.sf_principal = sf_annual_principal;
+            data.lp_capital = data.lp_capital;
+            data.lp_interest = lp_annual_interest;
+            data.lp_principal = lp_annual_principal;
+            data.lp_pct = lp_pct;
+            data.lp_equity = data.lp_capital > 0 ? 'Yes' : 'No';
+
+            setText(scenario + '_total_debt', formatCurrency(data.total_debt));
+            setText(scenario + '_cf', formatCurrency(data.noi - data.total_servicing));
+            setText(scenario + '_owner_monthly', formatCurrency(data.owner_monthly_cf));
+
+            return data;
         }
 
         function calculateFiveYear() {
             const my = window.my_data || {};
 
+            const noiValues = [];
+            const cfValues = [];
+            const ownerCfValues = [];
+
             for (let year = 1; year <= 5; year++) {
                 const suffix = '_' + year;
-                const y = year;
 
                 // Occupancy
                 setText('fy_units' + suffix, Math.round(my.units || 270));
@@ -1096,6 +1570,16 @@
                 const ltv = valuation > 0 ? (my.total_debt || 15225000) / valuation : 0;
                 setText('fy_ltv' + suffix, formatPercent(ltv));
 
+                // Color code LTV
+                const ltvEl = document.getElementById('fy_ltv' + suffix);
+                if (ltvEl) {
+                    ltvEl.classList.remove('positive', 'warning', 'negative');
+                    const ltvVal = ltv * 100 || (ltv > 1 ? ltv : ltv * 100);
+                    if (ltv < 0.8) ltvEl.classList.add('positive');
+                    else if (ltv < 0.9) ltvEl.classList.add('warning');
+                    else ltvEl.classList.add('negative');
+                }
+
                 // Seller Debt Servicing
                 setText('fy_sf_debt' + suffix, formatCurrency(my.sf_amount || 9000000));
                 setText('fy_sf_interest' + suffix, formatCurrency(my.sf_interest || 540000));
@@ -1138,17 +1622,177 @@
                 const partners = getInputValue('fy_partners' + suffix);
                 const per_partner = partners > 0 ? owner_monthly / partners : 0;
                 setText('fy_per_partner' + suffix, formatCurrency(per_partner));
+
+                noiValues.push(noi);
+                cfValues.push(total_cf);
+                ownerCfValues.push(owner_cf);
+            }
+
+            drawChart(noiValues, cfValues, ownerCfValues);
+        }
+
+        function drawChart(noiValues, cfValues, ownerCfValues) {
+            const svg = document.getElementById('projection-chart');
+            if (!svg) return;
+
+            const svgNS = 'http://www.w3.org/2000/svg';
+            svg.innerHTML = '';
+
+            const maxValue = Math.max(...noiValues, ...cfValues, ...ownerCfValues);
+            const scale = 250 / maxValue;
+            const width = 800;
+            const height = 300;
+            const padding = 40;
+            const chartHeight = height - 2 * padding;
+            const chartWidth = width - 2 * padding;
+            const pointSpacing = chartWidth / 4;
+
+            for (let i = 0; i <= 4; i++) {
+                const line = document.createElementNS(svgNS, 'line');
+                line.setAttribute('x1', padding + i * pointSpacing);
+                line.setAttribute('y1', padding);
+                line.setAttribute('x2', padding + i * pointSpacing);
+                line.setAttribute('y2', height - padding);
+                line.setAttribute('stroke', '#e5e7eb');
+                line.setAttribute('stroke-width', '1');
+                svg.appendChild(line);
+            }
+
+            const drawLine = (values, color) => {
+                const path = document.createElementNS(svgNS, 'polyline');
+                const points = values.map((val, idx) => {
+                    const x = padding + idx * pointSpacing;
+                    const y = height - padding - (val * scale);
+                    return x + ',' + y;
+                }).join(' ');
+                path.setAttribute('points', points);
+                path.setAttribute('fill', 'none');
+                path.setAttribute('stroke', color);
+                path.setAttribute('stroke-width', '2');
+                svg.appendChild(path);
+            };
+
+            drawLine(noiValues, '#3b82f6');
+            drawLine(cfValues, '#10b981');
+            drawLine(ownerCfValues, '#f59e0b');
+
+            const drawPoints = (values, color) => {
+                values.forEach((val, idx) => {
+                    const x = padding + idx * pointSpacing;
+                    const y = height - padding - (val * scale);
+                    const circle = document.createElementNS(svgNS, 'circle');
+                    circle.setAttribute('cx', x);
+                    circle.setAttribute('cy', y);
+                    circle.setAttribute('r', '4');
+                    circle.setAttribute('fill', color);
+                    svg.appendChild(circle);
+                });
+            };
+
+            drawPoints(noiValues, '#3b82f6');
+            drawPoints(cfValues, '#10b981');
+            drawPoints(ownerCfValues, '#f59e0b');
+
+            for (let i = 0; i < 5; i++) {
+                const text = document.createElementNS(svgNS, 'text');
+                text.setAttribute('x', padding + i * pointSpacing);
+                text.setAttribute('y', height - 10);
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('font-size', '12');
+                text.setAttribute('fill', '#6b7280');
+                text.textContent = 'Year ' + (i + 1);
+                svg.appendChild(text);
             }
         }
 
-        // Event Listeners
-        document.querySelectorAll('input, select').forEach(el => {
-            el.addEventListener('change', calculateAll);
-            el.addEventListener('input', calculateAll);
-        });
+        function calculateAll() {
+            const asking = calculatePurchaseAnalysis('asking');
+            const my = calculatePurchaseAnalysis('my');
 
-        // Initial calculation
-        calculateAll();
+            setText('sticky_asking_monthly', formatCurrency(asking.owner_monthly_cf));
+            setText('sticky_my_monthly', formatCurrency(my.owner_monthly_cf));
+
+            const stickyAskingEl = document.getElementById('sticky_asking_monthly');
+            const stickyMyEl = document.getElementById('sticky_my_monthly');
+            if (stickyAskingEl) {
+                stickyAskingEl.classList.remove('positive', 'negative');
+                if (asking.owner_monthly_cf >= 0) {
+                    stickyAskingEl.classList.add('positive');
+                } else {
+                    stickyAskingEl.classList.add('negative');
+                }
+            }
+            if (stickyMyEl) {
+                stickyMyEl.classList.remove('positive', 'negative');
+                if (my.owner_monthly_cf >= 0) {
+                    stickyMyEl.classList.add('positive');
+                } else {
+                    stickyMyEl.classList.add('negative');
+                }
+            }
+
+            const expenseSavings = asking.goe - my.goe;
+            const cfDelta = my.owner_cf - asking.owner_cf;
+
+            const deltaExpenses = document.getElementById('delta_expenses');
+            const deltaOwnerCf = document.getElementById('delta_owner_cf');
+
+            if (deltaExpenses) {
+                deltaExpenses.textContent = formatCurrency(expenseSavings);
+                deltaExpenses.parentElement.parentElement.querySelector('.delta-icon').classList.remove('positive', 'negative');
+                deltaExpenses.parentElement.parentElement.querySelector('.delta-icon').classList.add(expenseSavings >= 0 ? 'positive' : 'negative');
+            }
+
+            if (deltaOwnerCf) {
+                deltaOwnerCf.textContent = formatCurrency(cfDelta);
+                deltaOwnerCf.parentElement.parentElement.querySelector('.delta-icon').classList.remove('positive', 'negative');
+                deltaOwnerCf.parentElement.parentElement.querySelector('.delta-icon').classList.add(cfDelta >= 0 ? 'positive' : 'negative');
+            }
+
+            calculateFiveYear();
+        }
+
+        function switchTab(tabName) {
+            const tabs = document.querySelectorAll('.tab-content');
+            const buttons = document.querySelectorAll('.tab-button');
+
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function initRangeSliders() {
+            syncSliders('asking');
+            syncSliders('my');
+        }
+
+        function attachFiveYearInputListeners() {
+            const fyInputIds = [
+                'fy_rent_growth_1', 'fy_rent_growth_2', 'fy_rent_growth_3', 'fy_rent_growth_4', 'fy_rent_growth_5',
+                'fy_goe_ratio_1', 'fy_goe_ratio_2', 'fy_goe_ratio_3', 'fy_goe_ratio_4', 'fy_goe_ratio_5',
+                'fy_cap_rate_1', 'fy_cap_rate_2', 'fy_cap_rate_3', 'fy_cap_rate_4', 'fy_cap_rate_5',
+                'fy_partners_1', 'fy_partners_2', 'fy_partners_3', 'fy_partners_4', 'fy_partners_5'
+            ];
+
+            fyInputIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', calculateFiveYear);
+                }
+            });
+        }
+
+        window.addEventListener('load', () => {
+            initRangeSliders();
+            attachFiveYearInputListeners();
+            calculateAll();
+        });
     </script>
 </body>
 </html>
