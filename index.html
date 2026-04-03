@@ -257,7 +257,7 @@
 
         .accordion-header {
             padding: 20px 24px;
-            background: var(--white);
+            background: #e8f4fd;
             border: none;
             cursor: pointer;
             display: flex;
@@ -272,7 +272,7 @@
         }
 
         .accordion-header:hover {
-            background-color: #f9fafb;
+            background-color: #d6ebf7;
         }
 
         .accordion.expanded .accordion-header {
@@ -362,12 +362,13 @@
             position: absolute;
             left: 14px;
             font-weight: 600;
+            font-size: 16px;
             color: var(--text-dark);
             pointer-events: none;
         }
 
         .currency-input {
-            padding-left: 28px;
+            padding-left: 34px;
         }
 
         input[type="number"],
@@ -376,7 +377,7 @@
             padding: 12px 16px;
             border: 1px solid var(--border);
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 16px;
             font-family: inherit;
             transition: all 0.3s ease;
             background-color: var(--white);
@@ -995,6 +996,130 @@
 
         <div id="five-year" class="tab-content">
             <div class="chart-container">
+                <h3 class="chart-title">Scenario Comparison</h3>
+                <div class="chart-legend">
+                    <div class="legend-item"><span class="legend-dot noi"></span>Asking NOI</div>
+                    <div class="legend-item"><span class="legend-dot cash-flow"></span>Your Cash Flow</div>
+                </div>
+                <svg id="comparisonChart" viewBox="0 0 800 300"></svg>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Year</th>
+                            <th class="numeric">Asking NOI</th>
+                            <th class="numeric">Asking Owner CF</th>
+                            <th class="numeric">Your NOI</th>
+                            <th class="numeric">Your Owner CF</th>
+                            <th class="numeric">CF Delta</th>
+                        </tr>
+                    </thead>
+                    <tbody id="projectionTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+ninput="calculateAll()" value="10000"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion expanded">
+                        <button class="accordion-header" onclick="this.parentElement.classList.toggle('expanded')">Seller Financing<div class="accordion-chevron"></div></button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="form-grid full">
+                                    <div class="form-group"><label class="form-label">% Seller Finance</label><div class="form-group"><input type="number" id="my_sf_pct" placeholder="%" min="0" max="100" oninput="calculateAll()" value="60"><div class="range-slider-wrapper"><input type="range" id="my_sf_pct_slider" min="0" max="100" oninput="document.getElementById('my_sf_pct').value = this.value; calculateAll();" value="60"><div class="range-label"><span>0%</span><span>100%</span></div></div></div></div>
+                                    <div class="form-group"><label class="form-label">Seller Finance Amount</label><div class="output-field"><span class="output-value" id="my_sf_amount">$0</span></div></div>
+                                </div>
+                                <div class="form-grid" style="margin-top: 16px;">
+                                    <div class="form-group"><label class="form-label">Interest Rate (%)</label><div class="form-group"><input type="number" id="my_sf_rate" placeholder="Rate" min="0" max="15" step="0.1" oninput="calculateAll()" value="6"><div class="range-slider-wrapper"><input type="range" id="my_sf_rate_slider" min="0" max="15" step="0.1" oninput="document.getElementById('my_sf_rate').value = this.value; calculateAll();" value="6"><div class="range-label"><span>0%</span><span>15%</span></div></div></div></div>
+                                    <div class="form-group"><label class="form-label">Amortization (Years)</label><input type="number" id="my_sf_years" placeholder="Years" oninput="calculateAll()" value="30"></div>
+                                    <div class="form-group"><label class="form-label">Interest-Only (Years)</label><input type="number" id="my_sf_io" placeholder="IO Years" oninput="calculateAll()" value="30"></div>
+                                </div>
+                                <div class="form-grid" style="margin-top: 16px;">
+                                    <div class="output-field"><span class="form-label">Monthly Payment</span><span class="output-value numeric" id="my_sf_payment">$0</span></div>
+                                    <div class="output-field"><span class="form-label">Annual Interest</span><span class="output-value numeric" id="my_sf_interest">$0</span></div>
+                                    <div class="output-field"><span class="form-label">Annual Principal</span><span class="output-value numeric" id="my_sf_principal">$0</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion expanded">
+                        <button class="accordion-header" onclick="this.parentElement.classList.toggle('expanded')">Capital Requirements<div class="accordion-chevron"></div></button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="form-grid full">
+                                    <div class="form-group"><label class="form-label">Down Payment</label><div class="output-field"><span class="output-value numeric" id="my_down_payment">$0</span></div></div>
+                                    <div class="form-group"><label class="form-label">LP Equity Required</label><div class="output-field"><span class="output-value numeric" id="my_lp_capital">$0</span></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion expanded">
+                        <button class="accordion-header" onclick="this.parentElement.classList.toggle('expanded')">LP Debt Terms<div class="accordion-chevron"></div></button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="form-grid full">
+                                    <div class="form-group"><label class="form-label">LP Debt as % of Cash Flow</label><div class="form-group"><input type="number" id="my_lp_pct" placeholder="%" min="0" max="100" oninput="calculateAll()" value="80"><div class="range-slider-wrapper"><input type="range" id="my_lp_pct_slider" min="0" max="100" oninput="document.getElementById('my_lp_pct').value = this.value; calculateAll();" value="80"><div class="range-label"><span>0%</span><span>100%</span></div></div></div></div>
+                                </div>
+                                <div class="form-grid" style="margin-top: 16px;">
+                                    <div class="form-group"><label class="form-label">LP Interest Rate (%)</label><div class="form-group"><input type="number" id="my_lp_rate" placeholder="Rate" min="0" max="15" step="0.1" oninput="calculateAll()" value="10"><div class="range-slider-wrapper"><input type="range" id="my_lp_rate_slider" min="0" max="15" step="0.1" oninput="document.getElementById('my_lp_rate').value = this.value; calculateAll();" value="10"><div class="range-label"><span>0%</span><span>15%</span></div></div></div></div>
+                                    <div class="form-group"><label class="form-label">LP Amortization (Years)</label><input type="number" id="my_lp_years" placeholder="Years" oninput="calculateAll()" value="30"></div>
+                                    <div class="form-group"><label class="form-label">LP Interest-Only (Years)</label><input type="number" id="my_lp_io" placeholder="IO Years" oninput="calculateAll()" value="30"></div>
+                                </div>
+                                <div class="form-grid" style="margin-top: 16px;">
+                                    <div class="output-field"><span class="form-label">LP Monthly Payment</span><span class="output-value numeric" id="my_lp_payment">$0</span></div>
+                                    <div class="output-field"><span class="form-label">LP Annual Interest</span><span class="output-value numeric" id="my_lp_interest">$0</span></div>
+                                    <div class="output-field"><span class="form-label">LP Annual Principal</span><span class="output-value numeric" id="my_lp_principal">$0</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion expanded">
+                        <button class="accordion-header" onclick="this.parentElement.classList.toggle('expanded')">Debt & Cash Flow<div class="accordion-chevron"></div></button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="form-grid">
+                                    <div class="output-field"><span class="form-label">Total Debt</span><span class="output-value numeric" id="my_total_debt">$0</span></div>
+                                    <div class="output-field"><span class="form-label">Total Debt Servicing</span><span class="output-value numeric" id="my_total_servicing">$0</span></div>
+                                    <div class="output-field"><span class="form-label">Cash Flow</span><span class="output-value numeric" id="my_cf">$0</span></div>
+                                    <div class="output-field"><span class="form-label">Owner Monthly</span><span class="output-value numeric" id="my_owner_monthly">$0</span></div>
+                                    <div class="output-field"><span class="form-label">Owner Cash Flow</span><span class="output-value" id="my_owner_cf">$0</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion expanded">
+                        <button class="accordion-header" onclick="this.parentElement.classList.toggle('expanded')">LP Returns<div class="accordion-chevron"></div></button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="form-grid">
+                                    <div class="output-field"><span class="form-label">LP Equity Investment</span><span class="output-value numeric" id="my_lp_equity">$0</span></div>
+                                    <div class="output-field"><span class="form-label">LP Cash Flow Amount</span><span class="output-value numeric" id="my_lp_cf_amount">$0</span></div>
+                                </div>
+                                <div class="form-grid" style="margin-top: 16px;">
+                                    <div class="output-field"><span class="form-label">LP Total Income (CF + Principal)</span><span class="output-value numeric" id="my_lp_total_income">$0</span></div>
+                                    <div class="output-field"><span class="form-label">LP Cash on Cash %</span><span class="output-value" id="my_lp_coc">0%</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="five-year" class="tab-content">
+            <div class="chart-container">
                 <div class="chart-title">5-Year Financial Projections</div>
                 <div class="chart-legend">
                     <div class="legend-item"><div class="legend-dot noi"></div><span>NOI</span></div>
@@ -1179,7 +1304,7 @@
                             <td id="fy_lp_debt_3">$0</td>
                             <td id="fy_lp_debt_4">$0</td>
                             <td id="fy_lp_debt_5">$0</td>
-                        </tr>
+                        </tr>        </tr>
                         <tr>
                             <td>LP Interest</td>
                             <td id="fy_lp_interest_1">$0</td>
@@ -1594,7 +1719,7 @@
                 // Total Debt Servicing
                 setText('fy_total_debt' + suffix, formatCurrency(my.total_debt || 1935000));
 
-                const total_servicing = (my.sf_interest || 72000) + (my.sf_principal || 0) + (my.lp_interest || 93500) + (my.lp_principal || 0);
+                const total_servicing = (my.sf_interest || 72000) + (my.sf_principal || 0) + (my.lp_interest || 93500) + (my.lp_principal || 0);rincipal || 0);
                 setText('fy_total_servicing' + suffix, formatCurrency(total_servicing));
 
                 // Cash Flow
