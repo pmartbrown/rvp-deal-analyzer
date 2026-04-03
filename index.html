@@ -703,15 +703,15 @@
                                 <div class="form-grid full">
                                     <div class="form-group">
                                         <label class="form-label">Gross Park Revenue (GPR)</label>
-                                        <div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="asking_gpr" class="currency-input" placeholder="Annual GPR" oninput="calculateAll()" value="0"></div>
+                                        <div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="asking_gpr" class="currency-input" placeholder="Annual GPR" oninput="calculateAll()" value="200000"></div>
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label">Total Units</label>
-                                        <input type="number" id="asking_units" placeholder="Units" oninput="calculateAll()" value="270">
+                                        <input type="number" id="asking_units" placeholder="Units" oninput="calculateAll()" value="100">
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label">Occupied Units</label>
-                                        <input type="number" id="asking_occupied" placeholder="Occupied" oninput="calculateAll()" value="270">
+                                        <input type="number" id="asking_occupied" placeholder="Occupied" oninput="calculateAll()" value="100">
                                     </div>
                                 </div>
                                 <div class="form-grid" style="margin-top: 16px;">
@@ -729,7 +729,7 @@
                                 <div class="form-grid full">
                                     <div class="form-group">
                                         <label class="form-label">Gross Operating Expenses</label>
-                                        <div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="asking_goe" class="currency-input" placeholder="GOE" oninput="calculateAll()" value="920000"></div>
+                                        <div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="asking_goe" class="currency-input" placeholder="GOE" oninput="calculateAll()" value="70000"></div>
                                     </div>
                                 </div>
                                 <div class="form-grid" style="margin-top: 16px;">
@@ -747,14 +747,14 @@
                                 <div class="form-grid full">
                                     <div class="form-group">
                                         <label class="form-label">Purchase Price</label>
-                                        <div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="asking_purchase" class="currency-input" placeholder="Purchase Price" oninput="calculateAll()" value="15000000"></div>
+                                        <div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="asking_purchase" class="currency-input" placeholder="Purchase Price" oninput="calculateAll()" value="2000000"></div>
                                     </div>
                                 </div>
                                 <div class="form-grid" style="margin-top: 16px;">
                                     <div class="form-group"><label class="form-label">Acquisition Fee</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="asking_acq_fee" class="currency-input" placeholder="Acq Fee" oninput="calculateAll()" value="50000"></div></div>
-                                    <div class="form-group"><label class="form-label">CapEx Reserve</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="asking_capex" class="currency-input" placeholder="CapEx" oninput="calculateAll()" value="100000"></div></div>
-                                    <div class="form-group"><label class="form-label">Referral Fee</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="asking_referral" class="currency-input" placeholder="Referral" oninput="calculateAll()" value="0"></div></div>
-                                    <div class="form-group"><label class="form-label">Closing Costs</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="asking_closing" class="currency-input" placeholder="Closing" oninput="calculateAll()" value="75000"></div></div>
+                                    <div class="form-group"><label class="form-label">CapEx Reserve</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="asking_capex" class="currency-input" placeholder="CapEx" oninput="calculateAll()" value="50000"></div></div>
+                                    <div class="form-group"><label class="form-label">Referral Fee</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="asking_referral" class="currency-input" placeholder="Referral" oninput="calculateAll()" value="25000"></div></div>
+                                    <div class="form-group"><label class="form-label">Closing Costs</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="asking_closing" class="currency-input" placeholder="Closing" oninput="calculateAll()" value="10000"></div></div>
                                 </div>
                             </div>
                         </div>
@@ -802,7 +802,7 @@
                                     <div class="form-group"><label class="form-label">LP Debt as % of Cash Flow</label><div class="form-group"><input type="number" id="asking_lp_pct" placeholder="%" min="0" max="100" oninput="calculateAll()" value="80"><div class="range-slider-wrapper"><input type="range" id="asking_lp_pct_slider" min="0" max="100" oninput="document.getElementById('asking_lp_pct').value = this.value; calculateAll();" value="80"><div class="range-label"><span>0%</span><span>100%</span></div></div></div></div>
                                 </div>
                                 <div class="form-grid" style="margin-top: 16px;">
-                                    <div class="form-group"><label class="form-label">LP Interest Rate (%)</label><div class="form-group"><input type="number" id="asking_lp_rate" placeholder="Rate" min="0" max="15" step="0.1" oninput="calculateAll()" value="6"><div class="range-slider-wrapper"><input type="range" id="asking_lp_rate_slider" min="0" max="15" step="0.1" oninput="document.getElementById('asking_lp_rate').value = this.value; calculateAll();" value="6"><div class="range-label"><span>0%</span><span>15%</span></div></div></div></div>
+                                    <div class="form-group"><label class="form-label">LP Interest Rate (%)</label><div class="form-group"><input type="number" id="asking_lp_rate" placeholder="Rate" min="0" max="15" step="0.1" oninput="calculateAll()" value="10"><div class="range-slider-wrapper"><input type="range" id="asking_lp_rate_slider" min="0" max="15" step="0.1" oninput="document.getElementById('asking_lp_rate').value = this.value; calculateAll();" value="10"><div class="range-label"><span>0%</span><span>15%</span></div></div></div></div>
                                     <div class="form-group"><label class="form-label">LP Amortization (Years)</label><input type="number" id="asking_lp_years" placeholder="Years" oninput="calculateAll()" value="30"></div>
                                     <div class="form-group"><label class="form-label">LP Interest-Only (Years)</label><input type="number" id="asking_lp_io" placeholder="IO Years" oninput="calculateAll()" value="30"></div>
                                 </div>
@@ -860,9 +860,9 @@
                         <div class="accordion-content">
                             <div class="accordion-body">
                                 <div class="form-grid full">
-                                    <div class="form-group"><label class="form-label">Gross Park Revenue (GPR)</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="my_gpr" class="currency-input" placeholder="Annual GPR" oninput="calculateAll()" value="0"></div></div>
-                                    <div class="form-group"><label class="form-label">Total Units</label><input type="number" id="my_units" placeholder="Units" oninput="calculateAll()" value="270"></div>
-                                    <div class="form-group"><label class="form-label">Occupied Units</label><input type="number" id="my_occupied" placeholder="Occupied" oninput="calculateAll()" value="270"></div>
+                                    <div class="form-group"><label class="form-label">Gross Park Revenue (GPR)</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="my_gpr" class="currency-input" placeholder="Annual GPR" oninput="calculateAll()" value="200000"></div></div>
+                                    <div class="form-group"><label class="form-label">Total Units</label><input type="number" id="my_units" placeholder="Units" oninput="calculateAll()" value="100"></div>
+                                    <div class="form-group"><label class="form-label">Occupied Units</label><input type="number" id="my_occupied" placeholder="Occupied" oninput="calculateAll()" value="100"></div>
                                 </div>
                                 <div class="form-grid" style="margin-top: 16px;">
                                     <div class="output-field"><span class="form-label">Gross Income</span><span class="output-value" id="my_gross_income">$0</span></div>
@@ -877,7 +877,7 @@
                         <div class="accordion-content">
                             <div class="accordion-body">
                                 <div class="form-grid full">
-                                    <div class="form-group"><label class="form-label">Gross Operating Expenses</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="my_goe" class="currency-input" placeholder="GOE" oninput="calculateAll()" value="735000"></div></div>
+                                    <div class="form-group"><label class="form-label">Gross Operating Expenses</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="my_goe" class="currency-input" placeholder="GOE" oninput="calculateAll()" value="70000"></div></div>
                                 </div>
                                 <div class="form-grid" style="margin-top: 16px;">
                                     <div class="output-field"><span class="form-label">GOE as % of Gross Income</span><span class="output-value" id="my_goe_pct">0%</span></div>
@@ -892,13 +892,13 @@
                         <div class="accordion-content">
                             <div class="accordion-body">
                                 <div class="form-grid full">
-                                    <div class="form-group"><label class="form-label">Purchase Price</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="my_purchase" class="currency-input" placeholder="Purchase Price" oninput="calculateAll()" value="15000000"></div></div>
+                                    <div class="form-group"><label class="form-label">Purchase Price</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="my_purchase" class="currency-input" placeholder="Purchase Price" oninput="calculateAll()" value="2000000"></div></div>
                                 </div>
                                 <div class="form-grid" style="margin-top: 16px;">
                                     <div class="form-group"><label class="form-label">Acquisition Fee</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="my_acq_fee" class="currency-input" placeholder="Acq Fee" oninput="calculateAll()" value="50000"></div></div>
-                                    <div class="form-group"><label class="form-label">CapEx Reserve</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="my_capex" class="currency-input" placeholder="CapEx" oninput="calculateAll()" value="100000"></div></div>
-                                    <div class="form-group"><label class="form-label">Referral Fee</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="my_referral" class="currency-input" placeholder="Referral" oninput="calculateAll()" value="0"></div></div>
-                                    <div class="form-group"><label class="form-label">Closing Costs</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="my_closing" class="currency-input" placeholder="Closing" oninput="calculateAll()" value="75000"></div></div>
+                                    <div class="form-group"><label class="form-label">CapEx Reserve</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="my_capex" class="currency-input" placeholder="CapEx" oninput="calculateAll()" value="50000"></div></div>
+                                    <div class="form-group"><label class="form-label">Referral Fee</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="my_referral" class="currency-input" placeholder="Referral" oninput="calculateAll()" value="25000"></div></div>
+                                    <div class="form-group"><label class="form-label">Closing Costs</label><div class="currency-input-wrapper"><span class="currency-symbol">$</span><input type="number" id="my_closing" class="currency-input" placeholder="Closing" oninput="calculateAll()" value="10000"></div></div>
                                 </div>
                             </div>
                         </div>
@@ -946,7 +946,7 @@
                                     <div class="form-group"><label class="form-label">LP Debt as % of Cash Flow</label><div class="form-group"><input type="number" id="my_lp_pct" placeholder="%" min="0" max="100" oninput="calculateAll()" value="80"><div class="range-slider-wrapper"><input type="range" id="my_lp_pct_slider" min="0" max="100" oninput="document.getElementById('my_lp_pct').value = this.value; calculateAll();" value="80"><div class="range-label"><span>0%</span><span>100%</span></div></div></div></div>
                                 </div>
                                 <div class="form-grid" style="margin-top: 16px;">
-                                    <div class="form-group"><label class="form-label">LP Interest Rate (%)</label><div class="form-group"><input type="number" id="my_lp_rate" placeholder="Rate" min="0" max="15" step="0.1" oninput="calculateAll()" value="6"><div class="range-slider-wrapper"><input type="range" id="my_lp_rate_slider" min="0" max="15" step="0.1" oninput="document.getElementById('my_lp_rate').value = this.value; calculateAll();" value="6"><div class="range-label"><span>0%</span><span>15%</span></div></div></div></div>
+                                    <div class="form-group"><label class="form-label">LP Interest Rate (%)</label><div class="form-group"><input type="number" id="my_lp_rate" placeholder="Rate" min="0" max="15" step="0.1" oninput="calculateAll()" value="10"><div class="range-slider-wrapper"><input type="range" id="my_lp_rate_slider" min="0" max="15" step="0.1" oninput="document.getElementById('my_lp_rate').value = this.value; calculateAll();" value="10"><div class="range-label"><span>0%</span><span>15%</span></div></div></div></div>
                                     <div class="form-group"><label class="form-label">LP Amortization (Years)</label><input type="number" id="my_lp_years" placeholder="Years" oninput="calculateAll()" value="30"></div>
                                     <div class="form-group"><label class="form-label">LP Interest-Only (Years)</label><input type="number" id="my_lp_io" placeholder="IO Years" oninput="calculateAll()" value="30"></div>
                                 </div>
@@ -1022,19 +1022,19 @@
                         </tr>
                         <tr>
                             <td>Total Units</td>
-                            <td id="fy_units_1">270</td>
-                            <td id="fy_units_2">270</td>
-                            <td id="fy_units_3">270</td>
-                            <td id="fy_units_4">270</td>
-                            <td id="fy_units_5">270</td>
+                            <td id="fy_units_1">100</td>
+                            <td id="fy_units_2">100</td>
+                            <td id="fy_units_3">100</td>
+                            <td id="fy_units_4">100</td>
+                            <td id="fy_units_5">100</td>
                         </tr>
                         <tr>
                             <td>Occupied Units</td>
-                            <td id="fy_occupied_1">270</td>
-                            <td id="fy_occupied_2">270</td>
-                            <td id="fy_occupied_3">270</td>
-                            <td id="fy_occupied_4">270</td>
-                            <td id="fy_occupied_5">270</td>
+                            <td id="fy_occupied_1">100</td>
+                            <td id="fy_occupied_2">100</td>
+                            <td id="fy_occupied_3">100</td>
+                            <td id="fy_occupied_4">100</td>
+                            <td id="fy_occupied_5">100</td>
                         </tr>
                         <tr>
                             <td>Occupancy %</td>
@@ -1050,11 +1050,11 @@
                         </tr>
                         <tr>
                             <td>Avg Rent - Base</td>
-                            <td id="fy_rent_base_1">$648</td>
-                            <td id="fy_rent_base_2">$648</td>
-                            <td id="fy_rent_base_3">$648</td>
-                            <td id="fy_rent_base_4">$648</td>
-                            <td id="fy_rent_base_5">$648</td>
+                            <td id="fy_rent_base_1">$167</td>
+                            <td id="fy_rent_base_2">$167</td>
+                            <td id="fy_rent_base_3">$167</td>
+                            <td id="fy_rent_base_4">$167</td>
+                            <td id="fy_rent_base_5">$167</td>
                         </tr>
                         <tr>
                             <td>Rent Growth %</td>
@@ -1066,11 +1066,11 @@
                         </tr>
                         <tr>
                             <td>Avg Rent - New</td>
-                            <td id="fy_rent_new_1">$648</td>
-                            <td id="fy_rent_new_2">$648</td>
-                            <td id="fy_rent_new_3">$648</td>
-                            <td id="fy_rent_new_4">$648</td>
-                            <td id="fy_rent_new_5">$648</td>
+                            <td id="fy_rent_new_1">$167</td>
+                            <td id="fy_rent_new_2">$167</td>
+                            <td id="fy_rent_new_3">$167</td>
+                            <td id="fy_rent_new_4">$167</td>
+                            <td id="fy_rent_new_5">$167</td>
                         </tr>
 
                         <tr class="section-header-row">
@@ -1530,9 +1530,9 @@
                 const suffix = '_' + year;
 
                 // Occupancy
-                setText('fy_units' + suffix, Math.round(my.units || 270));
-                setText('fy_occupied' + suffix, Math.round(my.occupied || 270));
-                const occupancy_pct = my.units > 0 ? (my.occupied || 270) / (my.units || 270) : 1;
+                setText('fy_units' + suffix, Math.round(my.units || 100));
+                setText('fy_occupied' + suffix, Math.round(my.occupied || 100));
+                const occupancy_pct = my.units > 0 ? (my.occupied || 100) / (my.units || 100) : 1;
                 setText('fy_occupancy_pct' + suffix, formatPercent(occupancy_pct * 100));
 
                 // Monthly Rents
@@ -1540,7 +1540,7 @@
                 if (year === 1) {
                     base_rent = my.gross_income && my.occupied ? my.gross_income / (my.occupied * 12) : 648;
                 } else {
-                    const prev_rent_new = parseFloat(document.getElementById('fy_rent_new_' + (year - 1)).textContent.replace(/[$,]/g, '')) || 648;
+                    const prev_rent_new = parseFloat(document.getElementById('fy_rent_new_' + (year - 1)).textContent.replace(/[$,]/g, '')) || 167;
                     base_rent = prev_rent_new;
                 }
                 setText('fy_rent_base' + suffix, formatCurrency(base_rent));
@@ -1550,7 +1550,7 @@
                 setText('fy_rent_new' + suffix, formatCurrency(rent_new));
 
                 // Annual P&L
-                const gross_rent = (my.occupied || 270) * rent_new * 12;
+                const gross_rent = (my.occupied || 100) * rent_new * 12;
                 setText('fy_gross_rent' + suffix, formatCurrency(gross_rent));
 
                 const goe_ratio = getInputValue('fy_goe_ratio' + suffix) / 100;
@@ -1565,10 +1565,10 @@
                 const valuation = cap_rate > 0 ? noi / cap_rate : 0;
                 setText('fy_valuation' + suffix, formatCurrency(valuation));
 
-                const value_change = valuation - (my.purchase || 15000000);
+                const value_change = valuation - (my.purchase || 2000000);
                 setText('fy_value_change' + suffix, formatCurrency(value_change));
 
-                const ltv = valuation > 0 ? (my.total_debt || 15225000) / valuation : 0;
+                const ltv = valuation > 0 ? (my.total_debt || 1935000) / valuation : 0;
                 setText('fy_ltv' + suffix, formatPercent(ltv * 100));
 
                 // Color code LTV
@@ -1582,19 +1582,19 @@
                 }
 
                 // Seller Debt Servicing
-                setText('fy_sf_debt' + suffix, formatCurrency(my.sf_amount || 9000000));
-                setText('fy_sf_interest' + suffix, formatCurrency(my.sf_interest || 540000));
+                setText('fy_sf_debt' + suffix, formatCurrency(my.sf_amount || 1200000));
+                setText('fy_sf_interest' + suffix, formatCurrency(my.sf_interest || 72000));
                 setText('fy_sf_principal' + suffix, formatCurrency(my.sf_principal || 0));
 
                 // LP Debt Servicing
-                setText('fy_lp_debt' + suffix, formatCurrency(my.lp_capital || 6225000));
-                setText('fy_lp_interest' + suffix, formatCurrency(my.lp_interest || 373500));
+                setText('fy_lp_debt' + suffix, formatCurrency(my.lp_capital || 935000));
+                setText('fy_lp_interest' + suffix, formatCurrency(my.lp_interest || 93500));
                 setText('fy_lp_principal' + suffix, formatCurrency(my.lp_principal || 0));
 
                 // Total Debt Servicing
-                setText('fy_total_debt' + suffix, formatCurrency(my.total_debt || 15225000));
+                setText('fy_total_debt' + suffix, formatCurrency(my.total_debt || 1935000));
 
-                const total_servicing = (my.sf_interest || 540000) + (my.sf_principal || 0) + (my.lp_interest || 373500) + (my.lp_principal || 0);
+                const total_servicing = (my.sf_interest || 72000) + (my.sf_principal || 0) + (my.lp_interest || 93500) + (my.lp_principal || 0);
                 setText('fy_total_servicing' + suffix, formatCurrency(total_servicing));
 
                 // Cash Flow
@@ -1608,7 +1608,7 @@
                 const lp_cf = total_cf * lp_share;
                 setText('fy_lp_cf' + suffix, formatCurrency(lp_cf));
 
-                const lp_pi = (my.lp_interest || 373500) + (my.lp_principal || 0);
+                const lp_pi = (my.lp_interest || 93500) + (my.lp_principal || 0);
                 setText('fy_lp_pi' + suffix, formatCurrency(lp_pi));
 
                 const lp_total_income = lp_cf + lp_pi;
